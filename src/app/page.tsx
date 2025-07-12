@@ -1,5 +1,6 @@
 import Link from 'next/link';
-//criei essa home de teste para ver se o next estava funcionando
+import NavbarTabs from '../componentes/navbar/navbar'; 
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-gray-50 font-sans">
@@ -13,7 +14,7 @@ export default function HomePage() {
             <input
               type="text"
               placeholder="Pesquisar medicamentos, produtos e mais"
-              className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none"
+              className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none placeholder-[#9eb8dc]"
             />
           </div>
           <div className="flex items-center gap-4">
@@ -23,19 +24,9 @@ export default function HomePage() {
           </div>
         </div>
 
-        {/* Navigation */}
-        <nav className="bg-white border-t border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 py-2 flex gap-6 text-sm font-medium text-gray-700">
-            <Link href="#" className="hover:text-blue-600">
-              Conheça o programa
-            </Link>
-            <Link href="#" className="hover:text-blue-600">
-              Medicamentos disponíveis
-            </Link>
-          </div>
-        </nav>
+        <NavbarTabs />
       </header>
-
     </main>
   );
 }
+
