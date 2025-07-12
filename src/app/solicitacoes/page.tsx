@@ -1,4 +1,5 @@
 import Link from 'next/link';
+import NavbarTabs from '@/componentes/navbar/navbar';
 //criei essa home de teste para ver se o next estava funcionando
 export default function HomePage() {
   return (
@@ -22,18 +23,8 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-
-        {/* Navigation */}
-        <nav className="bg-white border-t border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 py-2 flex gap-6 text-sm font-medium text-gray-700">
-            <Link href="#" className="hover:text-blue-600">
-              Conheça o programa
-            </Link>
-            <Link href="#" className="hover:text-blue-600">
-              Medicamentos disponíveis
-            </Link>
-          </div>
-        </nav>
+    <NavbarTabs />
+       
       </header>
 
     </main>
