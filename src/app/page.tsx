@@ -1,6 +1,7 @@
 'use client';
 import Link from 'next/link';
 import BannerRotativo from '@/componentes/banner/BannerRotativo'; // importe o banner
+import NavbarTabs from '../componentes/navbar/navbar'; 
 
 export default function HomePage() {
   return (
@@ -24,24 +25,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-
-        {/* Navigation: preenchendo 100% da largura e separando igualmente */}
-      <nav className="bg-white border-t border-b border-gray-200 shadow-sm w-full">
-        <div className="w-full px-8 py-3 flex justify-between text-sm font-medium text-gray-700">
-          <Link href="#" className="hover:text-blue-600">
-            Conheça o programa
-          </Link>
-          <Link href="#" className="hover:text-blue-600">
-            Medicamentos disponíveis
-          </Link>
-          <Link href="#" className="hover:text-blue-600">
-            Solicitações
-          </Link>
-          <Link href="#" className="hover:text-blue-600">
-            Sobre nós
-          </Link>
-        </div>
-      </nav>
+         <NavbarTabs />
       </header>
 
       {/* Banner rotativo aqui */}
