@@ -25,8 +25,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-
-        <NavbarTabs />
+         <NavbarTabs />
       </header>
 
       <div className="max-w-7xl mx-auto px-4 py-8">
@@ -35,4 +34,3 @@ export default function HomePage() {
     </main>
   );
 }
-
