@@ -5,8 +5,15 @@ import Modal from '@/componentes/Modal_Simples/Modal'
 import Tag from '@/componentes/tag/Tag'
 import KanbanBoard from '@/componentes/kanban_board/KanbanBoard'
 
+import { InputTexto } from "@/componentes/ui/InputText";
+import { Dropdown } from "@/componentes/ui/Dropdown";
+import { WizardForm } from "@/componentes/ui/WizardForm";
+import { useState } from 'react'
+
+import { FuncionarioDashboard } from "@/componentes/dashboard/FuncionarioDashboard";
 export default function TestePage() {
   const { isOpen, open, close } = useModal()
+  const [nome, setNome] = useState("");
 
   return (
     <main className="min-h-screen bg-gray-50 p-8 font-sans">
@@ -42,6 +49,41 @@ export default function TestePage() {
         <h2 className="text-lg font-semibold mb-2">Componente: KanbanBoard</h2>
         <KanbanBoard />
       </div>
-    </main>
+
+       {/* InputTexto */}
+        <div>
+          <label className="block mb-2 font-semibold">InputTexto</label>
+          <InputTexto
+            placeholder="Digite seu nome"
+            value={nome}
+            onChange={(e) => setNome(e.target.value)}
+          />
+          <p className="mt-2 text-sm text-gray-600">Você digitou: <strong>{nome}</strong></p>
+        </div>
+
+        {/* Dropdown */}
+        <div>
+          <label className="block mb-2 font-semibold">Dropdown</label>
+          <Dropdown
+            label="Opções"
+            options={[
+              { label: "Editar", onClick: () => alert("Editar clicado") },
+              { label: "Excluir", onClick: () => alert("Excluir clicado") },
+            ]}
+          />
+        </div>
+
+        {/* WizardForm */}
+        <div>
+          <label className="block mb-2 font-semibold">WizardForm</label>
+          <WizardForm />
+        </div>
+
+        {/* Dashboard do Funcionário */}
+              <section>
+                <h2 className="text-lg font-semibold mb-2">Componente: Dashboard Funcionário</h2>
+                <FuncionarioDashboard />
+              </section>
+            </main>
   )
 }

@@ -16,7 +16,7 @@ export default function HomePage() {
             <input
               type="text"
               placeholder="Pesquisar medicamentos, produtos e mais"
-              className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none placeholder-[#9eb8dc]"
+              className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none"
             />
           </div>
           <div className="flex items-center gap-4">
@@ -25,8 +25,7 @@ export default function HomePage() {
             </Link>
           </div>
         </div>
-
-        <NavbarTabs />
+         <NavbarTabs />
       </header>
 
           <div className="max-w-7xl mx-auto px-4 py-8">
@@ -35,4 +34,3 @@ export default function HomePage() {
     </main>
   );
 }
-
