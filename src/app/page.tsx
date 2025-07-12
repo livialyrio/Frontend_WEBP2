@@ -1,5 +1,7 @@
+'use client';
 import Link from 'next/link';
-//criei essa home de teste para ver se o next estava funcionando
+import BannerRotativo from '@/componentes/banner/BannerRotativo'; // importe o banner
+
 export default function HomePage() {
   return (
     <main className="min-h-screen bg-gray-50 font-sans">
@@ -36,6 +38,10 @@ export default function HomePage() {
         </nav>
       </header>
 
+      {/* Banner rotativo aqui */}
+      <div className="max-w-7xl mx-auto px-4 py-8">
+        <BannerRotativo />
+      </div>
     </main>
   );
 }
