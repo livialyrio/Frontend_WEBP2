@@ -1,7 +1,7 @@
 'use client';
+import BannerRotativo from '@/componentes/banner/BannerRotativo';
 import Link from 'next/link';
-import BannerRotativo from '@/componentes/banner/BannerRotativo'; 
-import NavbarTabs from '@/componentes/navbar/navbar';
+import NavbarTabs from '../componentes/navbar/navbar';
 
 export default function HomePage() {
   return (
@@ -15,8 +15,8 @@ export default function HomePage() {
           <div className="flex-1 mx-8">
             <input
               type="text"
-              placeholder="Pesquisar medicamentos, produtos e mais"
-              className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none"
+              placeholder="Pesquisar"
+              className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none placeholder-[#9eb8dc]"
             />
           </div>
           <div className="flex items-center gap-4">
@@ -28,7 +28,7 @@ export default function HomePage() {
          <NavbarTabs />
       </header>
 
-          <div className="max-w-7xl mx-auto px-4 py-8">
+      <div className="max-w-7xl mx-auto px-4 py-8">
         <BannerRotativo />
       </div>
     </main>
