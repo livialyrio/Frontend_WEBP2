@@ -1,7 +1,7 @@
 'use client';
+import BannerRotativo from '@/componentes/banner/BannerRotativo';
 import Link from 'next/link';
-import NavbarTabs from '../componentes/navbar/navbar'; 
-import BannerRotativo from '@/componentes/banner/BannerRotativo'; 
+import NavbarTabs from '../componentes/navbar/navbar';
 
 export default function HomePage() {
   return (

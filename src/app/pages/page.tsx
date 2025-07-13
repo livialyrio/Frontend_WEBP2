@@ -9,9 +9,9 @@ import React from 'react';
 export default function TesteComponentes() {
   return (
     <div className="flex flex-col gap-8 p-8">
-      <TabelaFiltros />
+      <TabelaFiltros data={[]} columns={[]} />
       <CardProduto />
-      <Button />
+      <Button children={undefined} />
       <BannerRotativo/>
     </div>
   );
