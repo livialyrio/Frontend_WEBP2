@@ -1,8 +1,8 @@
 'use client';
 
-import Button from '@/componentes/button/Button';
-import TabelaFiltros from '@/componentes/tabela/TabelaFiltros';
-import { InputTexto } from '@/componentes/ui/InputText';
+import Button from '@/components/button/Button';
+import TabelaFiltros from '@/components/tabela/TabelaFiltros';
+import { InputTexto } from '@/components/ui/InputText';
 import { useState } from 'react';
 import { useRouter } from 'next/navigation';
 

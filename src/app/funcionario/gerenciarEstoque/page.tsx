@@ -1,12 +1,12 @@
 'use client';
 
 import { useState } from 'react';
-import { Dropdown } from '@/componentes/ui/Dropdown';
-import { InputTexto } from '@/componentes/ui/InputText';
-import Modal from '@/componentes/Modal_Simples/Modal';
-import Tag from '@/componentes/tag/Tag';
+import { Dropdown } from '@/components/ui/Dropdown';
+import { InputTexto } from '@/components/ui/InputText';
+import Modal from '@/components/Modal_Simples/Modal';
+import Tag from '@/components/tag/Tag';
 import { useRouter } from 'next/navigation';
-import Button from '@/componentes/button/Button';
+import Button from '@/components/button/Button'; 
 
 export default function GerenciarEstoque() {
   const [filtroNome, setFiltroNome] = useState('');

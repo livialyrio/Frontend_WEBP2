@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Button from '@/componentes/button/Button';
-import { InputTexto } from '@/componentes/ui/InputText';
-import TabelaFiltros from '@/componentes/tabela/TabelaFiltros';
+import Button from '@/components/button/Button';
+import { InputTexto } from '@/components/ui/InputText';
+import TabelaFiltros from '@/components/tabela/TabelaFiltros';
 import { useRouter } from 'next/navigation';
 
 interface Receita {
