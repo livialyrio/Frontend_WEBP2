@@ -4,6 +4,7 @@ import { useState } from 'react';
 import Button from '@/componentes/button/Button';
 import { InputTexto } from '@/componentes/ui/InputText';
 import TabelaFiltros from '@/componentes/tabela/TabelaFiltros';
+import { useRouter } from 'next/navigation';
 
 interface Receita {
   idSolicitacao: number;
@@ -12,7 +13,7 @@ interface Receita {
   validade: string;
 }
 
-export default function GerenciarReceita() {
+export default function GerenciarReceita() { 
   const [receitas, setReceitas] = useState<Receita[]>([]);
 
   const [criando, setCriando] = useState(false);
@@ -35,7 +36,7 @@ export default function GerenciarReceita() {
   const [novaDescricaoAtualizar, setNovaDescricaoAtualizar] = useState('');
   const [novaDataAtualizar, setNovaDataAtualizar] = useState('');
   const [novaValidadeAtualizar, setNovaValidadeAtualizar] = useState('');
-
+  const router = useRouter();
   const resetarTelas = () => {
     setCriando(false);
     setRemovendo(false);
@@ -165,6 +166,9 @@ export default function GerenciarReceita() {
   return (
     <main className="min-h-screen bg-white p-6">
       <div className="max-w-5xl mx-auto">
+        <div className="mb-4">
+    
+  </div>
         <h1 className="text-3xl font-bold text-blue-900 mb-6">Gerenciar Receitas</h1>
 
         <section className="mb-6 flex gap-4 flex-wrap">
@@ -246,6 +250,7 @@ export default function GerenciarReceita() {
             <p>{mensagemValidade}</p>
           </section>
         )}
+        <Button onClick={() => router.push('/funcionario')}>Voltar</Button>
       </div>
     </main>
   );

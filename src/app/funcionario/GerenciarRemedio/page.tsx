@@ -4,6 +4,7 @@ import Button from '@/componentes/button/Button';
 import TabelaFiltros from '@/componentes/tabela/TabelaFiltros';
 import { InputTexto } from '@/componentes/ui/InputText';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Remedio {
   id: number;
@@ -236,6 +237,7 @@ export default function GerenciarRemedio() {
 
   return (
     <main className="min-h-screen bg-white p-6">
+      
       <div className="max-w-7xl mx-auto">
         <header className="mb-6 flex items-center justify-between">
           <h1 className="text-3xl font-bold text-blue-900">Gerenciar Remédios</h1>
