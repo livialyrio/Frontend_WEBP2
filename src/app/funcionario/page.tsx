@@ -60,7 +60,7 @@ export default function Funcionario() {
 
         <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <button
-            onClick={() => router.push('/remedios')}
+            onClick={() => router.push('/funcionario/GerenciarRemedio')}
             className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
             Gerenciar Remédio
