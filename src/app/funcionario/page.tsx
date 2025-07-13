@@ -2,6 +2,7 @@
 
 import { useRouter } from 'next/navigation';
 import { useEffect, useState } from 'react';
+import { FuncionarioDashboard } from "@/components/dashboard/FuncionarioDashboard";
 
 interface Funcionario {
   id: number;
@@ -102,6 +103,10 @@ export default function Funcionario() {
             Gerenciar Receitas
           </button>
         </div>
+        {/* Dashboard do Funcionário */}
+              <section>
+                  <FuncionarioDashboard />
+              </section>
       </div>
     </main>
   );
