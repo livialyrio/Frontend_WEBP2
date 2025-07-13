@@ -67,7 +67,7 @@ export default function MedicamentosDisponiveisPage() {
             <div className="bg-white border rounded-xl shadow-sm w-48 h-48 flex items-center justify-center mb-4 text-xl font-medium">
               {item.nome}
             </div>
-            <Button label="Mais info" />
+            <Button>Buscar</Button>
           </div>
         ))}
       </section>
