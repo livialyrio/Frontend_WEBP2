@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { InputTexto } from '@/componentes/ui/InputText';
 import Modal from '@/componentes/Modal_Simples/Modal';
 import Button from '@/componentes/button/Button';
+import { useRouter } from 'next/navigation';
 
 interface Farmacia {
   id: number;
@@ -23,6 +24,7 @@ export default function GerenciarFarmacias() {
   const [novaFarmacia, setNovaFarmacia] = useState<Partial<Farmacia>>({});
   const [filtroBairro, setFiltroBairro] = useState('');
   const [filtroCidade, setFiltroCidade] = useState({ valor: '', resultado: false });
+  const router = useRouter();
 
   useEffect(() => {
     setFarmacias([
@@ -113,6 +115,7 @@ export default function GerenciarFarmacias() {
         <Button onClick={() => setModalAberto(true)} className="text-sm">
             Criar Farmácia
         </Button>
+         <Button onClick={() => router.push('/funcionario')}>Voltar</Button>
         </div>
 
     {/* Botões e filtros */}
