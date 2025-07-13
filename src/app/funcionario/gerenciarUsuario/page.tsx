@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { InputTexto } from '@/componentes/ui/InputText';
 import Modal from '@/componentes/Modal_Simples/Modal';
 import Button from '@/componentes/button/Button';
+import { useRouter } from 'next/navigation';
 
 interface Usuario {
   id: number;
@@ -14,6 +15,7 @@ interface Usuario {
 }
 
 export default function GerenciarUsuarios() {
+  const router = useRouter();
   const [usuarios, setUsuarios] = useState<Usuario[]>([]);
   const [modalAberto, setModalAberto] = useState(false);
   const [modalEdicaoAberto, setModalEdicaoAberto] = useState(false);
@@ -25,9 +27,10 @@ export default function GerenciarUsuarios() {
 
   useEffect(() => {
     setUsuarios([
-      { id: 1, nome: 'Biankinha Popozao', email: 'bianka@email.com', cpf: '123.456.789-00', telefone: '(21) 98765-4321' },
+      { id: 1, nome: 'Bianka popozao', email: 'bianka@email.com', cpf: '123.456.789-00', telefone: '(21) 98765-4321' },
       { id: 2, nome: 'Maria Sapekinha', email: 'maria@email.com', cpf: '987.654.321-00', telefone: '(11) 99999-8888' },
-      { id: 3, nome: 'Carlos Andrade', email: 'carlos@email.com', cpf: '111.222.333-44', telefone: '(31) 98888-7777' }
+      { id: 3, nome: 'Carlin Tororo', email: 'carlos@email.com', cpf: '111.222.333-44', telefone: '(31) 98888-7777' },
+      { id: 3, nome: 'Livinha xerecao', email: 'livinha@email.com', cpf: '111.222.333-44', telefone: '(31) 98888-7777' }
     ]);
   }, []);
 
@@ -75,7 +78,9 @@ export default function GerenciarUsuarios() {
       <div className="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md">
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-blue-900">Gerenciar Usuários</h1>
-          <Button onClick={() => setModalAberto(true)} className="text-sm">Cadastrar Usuário</Button>
+          
+          <Button onClick={() => setModalAberto(true)} className="text-sm">Cadastrar Novo Usuário</Button>
+         <Button onClick={() => router.push('/funcionario')}>Voltar</Button>
         </div>
 
         <div className="flex flex-wrap gap-4 mb-6">

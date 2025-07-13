@@ -2,6 +2,7 @@
 import BannerRotativo from '@/componentes/banner/BannerRotativo';
 import Link from 'next/link';
 import NavbarTabs from '../componentes/navbar/navbar';
+import FaleConoscoButton from '@/componentes/fale_conosco/faleConosco';
 
 export default function HomePage() {
   return (
@@ -20,9 +21,16 @@ export default function HomePage() {
             />
           </div>
           <div className="flex items-center gap-4">
-            <Link href="#" className="text-sm text-gray-700 hover:underline">
-              Entrar / Cadastrar
-            </Link>
+        <a
+          href="http://localhost:5000/login?redirect=http://localhost:3005"
+          className="text-sm text-gray-700 hover:underline"
+        >
+          Entrar / Cadastrar
+        </a>
+
+
+         <FaleConoscoButton />
+
           </div>
         </div>
          <NavbarTabs />
