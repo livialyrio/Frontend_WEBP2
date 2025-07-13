@@ -1,9 +1,9 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { InputTexto } from '@/componentes/ui/InputText';
-import Modal from '@/componentes/Modal_Simples/Modal';
-import Button from '@/componentes/button/Button';
+import { InputTexto } from '@/components/ui/InputText';
+import Modal from '@/components/Modal_Simples/Modal';
+import Button from '@/components/button/Button';
 
 interface Usuario {
   id: number;
