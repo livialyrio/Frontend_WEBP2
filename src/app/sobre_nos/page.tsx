@@ -28,7 +28,7 @@ export default function MedicamentosDisponiveisPage() {
           </div>
         </div>
          <NavbarTabs />
-       
+     
       </header>
 
       {/* Conteúdo principal */}

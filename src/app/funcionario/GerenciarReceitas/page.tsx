@@ -36,7 +36,6 @@ export default function GerenciarReceita() {
   const [novaDescricaoAtualizar, setNovaDescricaoAtualizar] = useState('');
   const [novaDataAtualizar, setNovaDataAtualizar] = useState('');
   const [novaValidadeAtualizar, setNovaValidadeAtualizar] = useState('');
-
   const resetarTelas = () => {
     setCriando(false);
     setRemovendo(false);
