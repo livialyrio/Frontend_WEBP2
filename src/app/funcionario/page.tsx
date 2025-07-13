@@ -72,8 +72,8 @@ export default function Funcionario() {
             Gerenciar Remédio
           </button>
           <button
-            onClick={() => router.push('/farmacias')}
-            className="cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            onClick={() => router.push('/funcionario/gerenciarFarmacia')}
+            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
             Gerenciar Farmácias
           </button>
@@ -98,6 +98,7 @@ export default function Funcionario() {
           <button
             onClick={() => router.push('funcionario/GerenciarReceitas')}
             className="cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            
           >
             Gerenciar Receitas
           </button>
