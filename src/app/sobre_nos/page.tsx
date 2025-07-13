@@ -1,6 +1,6 @@
 'use client'
 import Link from 'next/link';
-import NavbarTabs from '@/componentes/navbar/navbar';
+import NavbarTabs from '@/components/navbar/navbar';
 import React, { useState } from 'react';
 
 export default function MedicamentosDisponiveisPage() {

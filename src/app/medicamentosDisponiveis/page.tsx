@@ -1,8 +1,8 @@
 'use client'
 
-import NavbarTabs from '@/componentes/navbar/navbar';
-import { Dropdown } from '@/componentes/ui/Dropdown';
-import Button from '@/componentes/button/Button';
+import NavbarTabs from '@/components/navbar/navbar';
+import { Dropdown } from '@/components/ui/Dropdown';
+import Button from '@/components/button/Button';
 import React, { useState } from 'react';
 
 const mockCards = Array.from({ length: 8 }, (_, i) => ({

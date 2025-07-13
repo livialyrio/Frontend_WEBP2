@@ -1,4 +1,4 @@
-import CadastroUsuario from '@/componentes/fomulario_Cadastro/cadastro_usuario'
+import CadastroUsuario from '@/components/fomulario_Cadastro/cadastro_usuario'
 
 export default function Page() {
   return (

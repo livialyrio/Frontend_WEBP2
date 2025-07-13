@@ -90,8 +90,8 @@ export default function Funcionario() {
             Gerenciar Solicitações
           </button>
           <button
-            onClick={() => router.push('/funcionario/GerenciarReceitas')}
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            onClick={() => router.push('funcionario/GerenciarReceitas')}
+            className="cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
             Gerenciar Receitas
           </button>

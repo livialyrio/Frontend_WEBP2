@@ -1,9 +1,9 @@
 'use client';
 
 import { useState } from 'react';
-import Button from '@/componentes/button/Button';
-import { InputTexto } from '@/componentes/ui/InputText';
-import TabelaFiltros from '@/componentes/tabela/TabelaFiltros';
+import Button from '@/components/button/Button';
+import { InputTexto } from '@/components/ui/InputText';
+import TabelaFiltros from '@/components/tabela/TabelaFiltros';
 import { useRouter } from 'next/navigation';
 
 interface Receita {
@@ -15,7 +15,6 @@ interface Receita {
 
 export default function GerenciarReceita() { 
   const [receitas, setReceitas] = useState<Receita[]>([]);
-
   const [criando, setCriando] = useState(false);
   const [removendo, setRemovendo] = useState(false);
   const [verificandoValidade, setVerificandoValidade] = useState(false);
@@ -172,6 +171,7 @@ export default function GerenciarReceita() {
         <h1 className="text-3xl font-bold text-blue-900 mb-6">Gerenciar Receitas</h1>
 
         <section className="mb-6 flex gap-4 flex-wrap">
+          <Button onClick={() => router.push('/funcionario')}>Voltar</Button>
           <Button onClick={abrirCriarReceita}>Criar Receita</Button>
           <Button onClick={abrirBuscarReceita}>Buscar Receita</Button>
           <Button onClick={abrirListarReceitas}>Listar Todas as Receitas</Button>

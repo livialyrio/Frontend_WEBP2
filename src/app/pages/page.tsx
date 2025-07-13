@@ -1,9 +1,9 @@
 'use client';
 
-import BannerRotativo from '@/componentes/banner/BannerRotativo';
-import Button from '@/componentes/button/Button';
-import CardProduto from '@/componentes/card/CardProduto';
-import TabelaFiltros from '@/componentes/tabela/TabelaFiltros';
+import BannerRotativo from '@/components/banner/BannerRotativo';
+import Button from '@/components/button/Button';
+import CardProduto from '@/components/card/CardProduto';
+import TabelaFiltros from '@/components/tabela/TabelaFiltros';
 import React from 'react';
 
 export default function TesteComponentes() {
