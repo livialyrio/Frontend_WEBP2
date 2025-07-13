@@ -66,7 +66,7 @@ export default function Funcionario() {
             Gerenciar Remédio
           </button>
           <button
-            onClick={() => router.push('/farmacias')}
+            onClick={() => router.push('funcionario/gerenciarFarmacia')}
             className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
             Gerenciar Farmácias
