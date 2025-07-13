@@ -1,8 +1,8 @@
 'use client';
 import Link from 'next/link';
-import NavbarTabs from '../componentes/navbar/navbar'; 
-import BannerRotativo from '@/componentes/banner/BannerRotativo'; 
-import FaleConoscoButton from '@/componentes/fale_conosco/faleConosco'
+import NavbarTabs from '../components/navbar/navbar'; 
+import BannerRotativo from '@/components/banner/BannerRotativo'; 
+import FaleConoscoButton from '@/components/fale_conosco/faleConosco'
 
 
 export default function HomePage() {
