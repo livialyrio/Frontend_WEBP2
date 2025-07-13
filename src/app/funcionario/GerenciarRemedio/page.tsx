@@ -4,6 +4,7 @@ import Button from '@/components/button/Button';
 import TabelaFiltros from '@/components/tabela/TabelaFiltros';
 import { InputTexto } from '@/components/ui/InputText';
 import { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 interface Remedio {
   nome: string;
@@ -132,9 +133,10 @@ export default function GerenciarRemedio() {
     { header: 'Nome', accessor: 'nome' },
     { header: 'Categoria', accessor: 'categoria' },
   ];
-
+  const router = useRouter();
   return (
     <main className="min-h-screen bg-white p-6">
+      
       <div className="max-w-7xl mx-auto">
         <header className="mb-6 flex items-center justify-between">
           <h1 className="text-3xl font-bold text-blue-900">Gerenciar Remédios</h1>
@@ -158,6 +160,9 @@ export default function GerenciarRemedio() {
           </Button>
           <Button onClick={abrirListarPorPrincipio}>
             Listar Remédios por Princípio Ativo
+          </Button>
+          <Button onClick={() => router.push('/funcionario')}>
+           Voltar
           </Button>
         </section>
 

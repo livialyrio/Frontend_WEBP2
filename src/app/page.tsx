@@ -29,6 +29,7 @@ export default function HomePage() {
           Entrar / Cadastrar
         </a>
 
+
          <FaleConoscoButton />
 
           </div>

@@ -58,40 +58,40 @@ export default function Funcionario() {
           <p><strong>Farmácia:</strong> {funcionario.farmacia}</p>
         </div>
 
-        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className=" mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
           <button
             onClick={() => router.push('/funcionario/GerenciarRemedio')}
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            className="cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
             Gerenciar Remédio
           </button>
           <button
             onClick={() => router.push('/farmacias')}
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            className="cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
             Gerenciar Farmácias
           </button>
           <button
             onClick={() => router.push('/funcionario/gerenciarEstoque')}
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            className="cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
             Gerenciar Estoques
           </button>
           <button
-            onClick={() => router.push('/usuarios')}
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            onClick={() => router.push('/funcionario/gerenciarUsuario')}
+            className="cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
             Gerenciar Usuários
           </button>
           <button
             onClick={() => router.push('/solicitacoes')}
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            className="cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
             Gerenciar Solicitações
           </button>
           <button
-            onClick={() => router.push('/receitas')}
-            className="bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+            onClick={() => router.push('funcionario/GerenciarReceitas')}
+            className="cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
             Gerenciar Receitas
           </button>

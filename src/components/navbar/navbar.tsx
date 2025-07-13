@@ -7,6 +7,7 @@ const tabs = [
   { href: '/', id: 'home', label: 'Conheça o programa' },
   { href: '/solicitacoes', id: 'solicitacao', label: 'Faça sua solicitação' },
   { href: '/medicamentosDisponiveis', id: 'medicamentos', label: 'Medicamentos disponíveis' },
+  {href: '/sobre_nos', label: 'Sobre nós'}
 ];
 
 export default function NavbarTabs() {
@@ -60,6 +61,16 @@ export default function NavbarTabs() {
             <h1 className="text-xl text-gray-700 font-bold mb-2">Medicamentos disponíveis</h1>
             <p className="text-gray-700">
               Confira a lista dos medicamentos que temos disponíveis no programa.
+            </p>
+          </div>
+        </div>
+      )}
+      {pathname === '/sobre_nos' && (
+        <div className="max-w-7xl mx-auto px-4 py-6">
+          <div>
+            <h1 className="text-xl text-gray-700 font-bold mb-2"></h1>
+            <p className="text-gray-700">
+             
             </p>
           </div>
         </div>
