@@ -49,7 +49,7 @@ export default function NavbarTabs() {
           <div>
             <h1 className="text-xl text-gray-700 font-bold mb-2">Faça sua solicitação</h1>
             <p className="text-gray-700">
-              Preencha o formulário para solicitar o medicamento desejado.
+              Preencha o formulário abaixo para solicitar o medicamento desejado.
             </p>
           </div>
         </div>

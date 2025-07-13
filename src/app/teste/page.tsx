@@ -1,16 +1,16 @@
 'use client'
 
-import { useModal } from '@/componentes/Modal_Simples/useModal'
-import Modal from '@/componentes/Modal_Simples/Modal'
-import Tag from '@/componentes/tag/Tag'
-import KanbanBoard from '@/componentes/kanban_board/KanbanBoard'
+import { useModal } from '@/components/Modal_Simples/useModal'
+import Modal from '@/components/Modal_Simples/Modal'
+import Tag from '@/components/tag/Tag'
+import KanbanBoard from '@/components/kanban_board/KanbanBoard'
 
-import { InputTexto } from "@/componentes/ui/InputText";
-import { Dropdown } from "@/componentes/ui/Dropdown";
-import { WizardForm } from "@/componentes/ui/WizardForm";
+import { InputTexto } from "@/components/ui/InputText";
+import { Dropdown } from "@/components/ui/Dropdown";
+import { WizardForm } from "@/components/ui/WizardForm";
 import { useState } from 'react'
 
-import { FuncionarioDashboard } from "@/componentes/dashboard/FuncionarioDashboard";
+import { FuncionarioDashboard } from "@/components/dashboard/FuncionarioDashboard";
 export default function TestePage() {
   const { isOpen, open, close } = useModal()
   const [nome, setNome] = useState("");
