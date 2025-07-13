@@ -1,8 +1,10 @@
 import React from 'react';
+import type { JSX } from 'react';
 
 interface TableColumn {
   header: string;
   accessor: string;
+  render?: (id: any, row: any) => JSX.Element;
 }
 
 interface TableDataRow {
