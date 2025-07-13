@@ -30,7 +30,7 @@ export default function GerenciarUsuarios() {
       { id: 1, nome: 'Bianka popozao', email: 'bianka@email.com', cpf: '123.456.789-00', telefone: '(21) 98765-4321' },
       { id: 2, nome: 'Maria Sapekinha', email: 'maria@email.com', cpf: '987.654.321-00', telefone: '(11) 99999-8888' },
       { id: 3, nome: 'Carlin Tororo', email: 'carlos@email.com', cpf: '111.222.333-44', telefone: '(31) 98888-7777' },
-      { id: 3, nome: 'Livinha xerecao', email: 'livinha@email.com', cpf: '111.222.333-44', telefone: '(31) 98888-7777' }
+      { id: 4, nome: 'Livinha xerecao', email: 'livinha@email.com', cpf: '111.222.333-44', telefone: '(31) 98888-7777' }
     ]);
   }, []);
 
