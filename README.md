@@ -1,7 +1,7 @@
 <h1>💊 Api - Farmácias Digitais Sociais</h1>
 O trabalho da API de farmácias digitais sociais consiste em um sistemas para facilitar o acesso gratuito a medicamentos, conectando pacientes a programas públicos e instituições parceiras. Essa solução automatiza e agiliza a distribuição de remédios essenciais a quem mais precisa.
 
-<h3>Descrição do Desenvolvimento</h3>
+<h3>Descrição do Desenvolvimento:</h3>
 
 + Nesse repositório, fizemos o front da API de Farmácias Digitais Sociais.
 + O nosso backend roda na porta 3001 e o front na porta 3005.
@@ -13,7 +13,5 @@ O trabalho da API de farmácias digitais sociais consiste em um sistemas para fa
   + A área de cliente, que mostra apenas funções básicas, como listar medicamentos disponíveis e criar solicitação.
 
 <h3>Autores:</h3>
-+ Bianca
-+ Carlos
-+ Lívia 
-+ Maria
+
+Bianca + Carlos + Lívia + Maria
