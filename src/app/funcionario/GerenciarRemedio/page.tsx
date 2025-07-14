@@ -15,6 +15,8 @@ interface RemedioEditando extends Partial<Remedio> {
 }
 
 export default function GerenciarRemedioPage() {
+  const [buscaId, setBuscaId] = useState('');
+  const [resultadoBusca, setResultadoBusca] = useState<Remedio | null>(null);
   const [remedios, setRemedios] = useState<Remedio[]>([
     { remedioId: 1, nome: 'Paracetamol', categoria: 'Analgésico', principio_ativo: 'Paracetamol', dosagem: '500mg', fabricante: 'MedPharma' },
     { remedioId: 2, nome: 'Amoxicilina', categoria: 'Antibiótico', principio_ativo: 'Amoxicilina', dosagem: '250mg', fabricante: 'BioLabs' },
@@ -43,6 +45,17 @@ export default function GerenciarRemedioPage() {
     );
     setTipoExibicao('remedios');
     setDadosGenericos(resultado);
+  }
+
+  function buscarPorId() {
+    const id = Number(buscaId.trim());
+    if (!id) {
+      setDadosGenericos([]);
+      return;
+    }
+    const encontrado = remedios.find(r => r.remedioId === id);
+    setTipoExibicao('remedios');
+    setDadosGenericos(encontrado ? [encontrado] : []);
   }
 
   function buscarPorCategoria() {
@@ -149,17 +162,40 @@ export default function GerenciarRemedioPage() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f8fcff] via-[#dceafd] to-[#9eb8dc] p-6">
       <div className="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        {/* ...existing code... */}
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-blue-900">Gerenciar Remédios</h1>
           <Button onClick={() => setModalAberto(true)}>Criar Remédio</Button>
           <Button onClick={() => router.push('/funcionario')}>Voltar</Button>
         </div>
 
+        {/* Filtros principais: nome, categoria, id */}
         <div className="flex flex-wrap gap-4 mb-6">
+          <InputTexto placeholder="Buscar por ID" value={buscaId} onChange={e => setBuscaId(e.target.value)} />
+          <Button onClick={buscarPorId}>Buscar por ID</Button>
+
           <InputTexto placeholder="Buscar por nome" value={filtroNome} onChange={(e) => setFiltroNome(e.target.value)} />
           <Button onClick={buscarPorNome}>Buscar por Nome</Button>
+
           <InputTexto placeholder="Buscar por categoria" value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)} />
           <Button onClick={buscarPorCategoria}>Buscar por Categoria</Button>
+        </div>
+
+        {/* Resultado da busca por ID */}
+        {resultadoBusca && (
+          <div className="mb-6 bg-blue-50 p-4 rounded shadow">
+            <h3 className="font-bold text-blue-800 mb-2">Resultado da Busca:</h3>
+            <div><b>ID:</b> {resultadoBusca.remedioId}</div>
+            <div><b>Nome:</b> {resultadoBusca.nome}</div>
+            <div><b>Categoria:</b> {resultadoBusca.categoria}</div>
+            <div><b>Princípio Ativo:</b> {resultadoBusca.principio_ativo}</div>
+            <div><b>Dosagem:</b> {resultadoBusca.dosagem}</div>
+            <div><b>Fabricante:</b> {resultadoBusca.fabricante}</div>
+          </div>
+        )}
+
+        {/* Ações extras */}
+        <div className="flex flex-wrap gap-4 mb-6">
           <Button onClick={buscarTodosRemedios}>Listar Todos os Remédios</Button>
           <Button onClick={buscarTodosPrincipiosAtivos}>Listar Todos os Princípios Ativos</Button>
           <Button onClick={buscarTodasCategorias}>Listar Todas as Categorias</Button>
