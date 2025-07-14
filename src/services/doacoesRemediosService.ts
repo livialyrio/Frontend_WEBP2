@@ -30,7 +30,7 @@ export async function criarDoacaoRemedio(doacao: DoacaoRemedio, token: string) {
   return response.json();
 }
 
-// Buscar todas as doações
+// lista todas as doações
 export async function listarDoacoesRemedios(token: string) {
   const response = await fetch(`${API_URL}`, {
     method: 'GET',
@@ -52,7 +52,7 @@ export async function buscarDoacaoPorId(id: number, token: string) {
   return response.json();
 }
 
-// Buscar doações de um usuário
+// listar doações de um usuário #
 export async function listarDoacoesPorUsuario(usuarioId: number, token: string) {
   const response = await fetch(`${API_URL}/usuario/${usuarioId}`, {
     method: 'GET',
@@ -75,7 +75,7 @@ export async function atualizarDoacaoRemedio(id: number, dados: DoacaoRemedio, t
   return response.json();
 }
 
-// Atualização parcial (patch)
+// Atualização parcial (patch) #
 export async function atualizarParcialDoacaoRemedio(id: number, dados: Partial<DoacaoRemedio>, token: string) {
   const response = await fetch(`${API_URL}/${id}`, {
     method: 'PATCH',
