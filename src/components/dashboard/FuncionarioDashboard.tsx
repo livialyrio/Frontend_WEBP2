@@ -9,7 +9,7 @@ const dashboardData = [
   { name: "Usuários", total: 320 },
   { name: "Solicitações", total: 78 },
   { name: "Receitas", total: 150 },
-  { name: "Doações de remédios", total: 69 },
+  { name: "Doações-remed", total: 69 },
 ];
 
 export const FuncionarioDashboard = () => {
