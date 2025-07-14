@@ -4,7 +4,7 @@ O trabalho da API de farmácias digitais sociais consiste em um sistemas para fa
 <h3>Descrição do Desenvolvimento</h3>
 
 RECURSOS UTILIZADOS:
-Sequelize, Nest, Html, CSS, React, Swagger, Fetch, PostgreSQL 
+Sequelize, Nest, HTML, CSS, React, Swagger, Fetch, PostgreSQL 
 
 + Nesse repositório, fizemos o front da API de Farmácias Digitais Sociais.
 + O nosso backend roda na porta 3001 e o front na porta 3005.
@@ -12,8 +12,8 @@ Sequelize, Nest, Html, CSS, React, Swagger, Fetch, PostgreSQL
 
 <h3>Temos 2 áreas principais no nosso site:</h3>
 
-  + a área de funcionários, que pode ser acessada através de http://localhost:3005/funcionario, abrindo a área de gerencia.
-  + a área de cliente, que mostra apenas funções básicas, como listar medicamentos disponíveis e criar solicitação.
+  + A área de funcionários, que pode ser acessada através de http://localhost:3005/funcionario, abrindo a área de gerencia.
+  + A área de cliente, que mostra apenas funções básicas, como listar medicamentos disponíveis e criar solicitação.
 
 <h3>Autores:</h3>
 + Bianca
