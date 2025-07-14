@@ -50,7 +50,17 @@ export default function Funcionario() {
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f8fcff] via-[#dceafd] to-[#9eb8dc] p-6">
       <div className="max-w-4xl mx-auto bg-white p-6 rounded-lg shadow-md">
-        <h1 className="text-3xl font-bold mb-4 text-blue-900">Bem-vindo funcionário</h1>
+        
+        <div className="flex justify-between items-center mb-4">
+          <h1 className="text-3xl font-bold text-blue-900">Bem-vindo funcionário</h1>
+          <button
+            onClick={() => router.push('/')}
+            className="cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
+          >
+            Início
+          </button>
+        </div>
+
         <div className="space-y-2 text-gray-800">
           <p><strong>Nome:</strong> {funcionario.nome}</p>
           <p><strong>Email:</strong> {funcionario.email}</p>
@@ -59,8 +69,8 @@ export default function Funcionario() {
           <p><strong>Farmácia:</strong> {funcionario.farmacia}</p>
         </div>
 
-        <div className=" mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-           <button
+        <div className="mt-8 grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <button
             onClick={() => router.push('/funcionario/GerenciarRemedio')}
             className="cursor-pointer bg-blue-600 text-white py-2 px-4 rounded hover:bg-blue-700 transition"
           >
@@ -103,10 +113,11 @@ export default function Funcionario() {
             Gerenciar Doações - Remédios
           </button>
         </div>
+
         {/* Dashboard do Funcionário */}
-              <section>
-                  <FuncionarioDashboard />
-              </section>
+        <section className="mt-8">
+          <FuncionarioDashboard />
+        </section>
       </div>
     </main>
   );
