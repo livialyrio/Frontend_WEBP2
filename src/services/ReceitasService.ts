@@ -20,7 +20,7 @@ export async function buscarReceitaPorId(id: number, token: string) {
   return response.json();
 }
 
-export async function criarReceita(dados: any, token: string) { // Added this function
+export async function criarReceita(dados: any, token: string) { 
   const response = await fetch(API_URL, {
     method: 'POST',
     headers: {

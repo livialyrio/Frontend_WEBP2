@@ -1,55 +1,85 @@
-export interface SolicitacaoDto {
+const API_URL = 'http://localhost:3001/solicitacoes';
+
+export interface Solicitacao {
+  id: number;
+  usuarioId: number;
+  remedioId: number;
+  farmaciaId: number;
+  justificativa: string;
+  dataCriacao: string;
+}
+
+export interface CriarSolicitacaoPayload {
   usuarioId: number;
   remedioId: number;
   farmaciaId: number;
   justificativa: string;
 }
 
-
-const BASE_URL = 'http://localhost:3005/solicitacoes';
-
-export async function listarSolicitacoes() {
-  const res = await fetch(`${BASE_URL}`);
-  if (!res.ok) throw new Error('Erro ao listar solicitações');
-  return res.json();
+function buildHeaders(token: string): Record<string, string> {
+  return {
+    'Content-Type': 'application/json',
+    Authorization: `Bearer ${token}`,
+  };
 }
 
-export async function buscarSolicitacaoPorId(id: number) {
-  const res = await fetch(`${BASE_URL}/${id}`);
-  if (!res.ok) throw new Error('Solicitação não encontrada');
-  return res.json();
+export async function listarSolicitacoes(token: string) {
+  const response = await fetch(API_URL, {
+    headers: buildHeaders(token), 
+  });
+  if (!response.ok) throw new Error('Erro ao listar solicitações');
+  return response.json();
 }
 
-export async function criarSolicitacao(dados: SolicitacaoDto) {
-  const res = await fetch(`${BASE_URL}`, {
+export async function criarSolicitacao(
+  dados: CriarSolicitacaoPayload,
+  token: string
+) {
+  const response = await fetch(API_URL, {
     method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildHeaders(token), 
     body: JSON.stringify(dados),
   });
-  if (!res.ok) throw new Error('Erro ao criar solicitação');
-  return res.json();
+  if (!response.ok) throw new Error('Erro ao criar solicitação');
+  return response.json();
 }
 
-export async function atualizarSolicitacao(id: number, dados: Partial<SolicitacaoDto>) {
-  const res = await fetch(`${BASE_URL}/${id}`, {
+export async function buscarSolicitacaoPorId(id: number, token: string) {
+  const response = await fetch(`${API_URL}/${id}`, {
+    headers: buildHeaders(token), 
+  });
+  if (!response.ok) throw new Error('Erro ao buscar solicitação por ID');
+  return response.json();
+}
+
+export async function atualizarSolicitacao(
+  id: number,
+  dados: Partial<CriarSolicitacaoPayload>,
+  token: string
+) {
+  const response = await fetch(`${API_URL}/${id}`, {
     method: 'PUT',
-    headers: { 'Content-Type': 'application/json' },
+    headers: buildHeaders(token), 
     body: JSON.stringify(dados),
   });
-  if (!res.ok) throw new Error('Erro ao atualizar solicitação');
-  return res.json();
+  if (!response.ok) throw new Error('Erro ao atualizar solicitação');
+  return response.json();
 }
 
-export async function removerSolicitacao(id: number) {
-  const res = await fetch(`${BASE_URL}/${id}`, {
+export async function removerSolicitacao(id: number, token: string) {
+  const response = await fetch(`${API_URL}/${id}`, {
     method: 'DELETE',
+    headers: buildHeaders(token),
   });
-  if (!res.ok) throw new Error('Erro ao remover solicitação');
-  return res.json();
+  if (!response.ok && response.status !== 204)
+    throw new Error('Erro ao remover solicitação');
+  return { sucesso: true };
 }
 
-export async function listarHistoricoSolicitacoes() {
-  const res = await fetch(`${BASE_URL}/historico`);
-  if (!res.ok) throw new Error('Erro ao buscar histórico');
-  return res.json();
+export async function listarHistoricoSolicitacoes(token: string) {
+  const response = await fetch(`${API_URL}/historico`, {
+    headers: buildHeaders(token), 
+  });
+  if (!response.ok) throw new Error('Erro ao listar histórico de solicitações');
+  return response.json();
 }
