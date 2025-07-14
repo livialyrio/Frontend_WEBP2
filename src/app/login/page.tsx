@@ -1,41 +1,43 @@
-import Link from 'next/link';
-//criei essa home de teste para ver se o next estava funcionando
-export default function HomePage() {
+'use client';
+
+import { useRouter } from 'next/navigation';
+import { useEffect } from 'react';
+import Funcionario from '../funcionario/page';
+
+export default function LoginUsuario() {
+  const router = useRouter();
+
+  useEffect(() => {
+    const token = localStorage.getItem('auth_token');
+    if (token) {
+      if(!Funcionario){
+      router.push('/usuario'); 
+    } else {
+      router.push('/funcionario'); 
+    }
+
+    }
+  }, [router]);
+
+  const redirecionarParaLoginExterno = () => {
+    const urlLoginExterno = 'http://localhost:5000/login?redirect=http://localhost:3005/logado';
+    window.location.href = urlLoginExterno;
+  };
+
   return (
-    <main className="min-h-screen bg-gray-50 font-sans">
-      {/* Top bar */}
-      <header className="bg-gradient-to-r from-white to-blue-100 shadow-sm">
-        <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="flex items-center gap-2">
-            <div className="text-blue-600 text-2xl font-bold">CefetFarma</div>
-          </div>
-          <div className="flex-1 mx-8">
-            <input
-              type="text"
-              placeholder="Pesquisar medicamentos, produtos e mais"
-              className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none"
-            />
-          </div>
-          <div className="flex items-center gap-4">
-            <Link href="#" className="text-sm text-gray-700 hover:underline">
-              Entrar / Cadastrar
-            </Link>
-          </div>
-        </div>
-
-        {/* Navigation */}
-        <nav className="bg-white border-t border-b border-gray-200">
-          <div className="max-w-7xl mx-auto px-4 py-2 flex gap-6 text-sm font-medium text-gray-700">
-            <Link href="#" className="hover:text-blue-600">
-              Conheça o programa
-            </Link>
-            <Link href="#" className="hover:text-blue-600">
-              Medicamentos disponíveis
-            </Link>
-          </div>
-        </nav>
-      </header>
-
+    <main className="min-h-screen flex items-center justify-center bg-gradient-to-br from-[#f8fcff] via-[#dceafd] to-[#9eb8dc] p-6">
+      <div className="bg-white p-8 rounded-lg shadow-lg max-w-md w-full text-center">
+        <h1 className="text-2xl font-bold mb-4 text-blue-900">Login do Usuário</h1>
+        <p className="text-gray-700 mb-6">
+          Você será redirecionado para o sistema de autenticação do outro grupo.
+        </p>
+        <button
+          onClick={redirecionarParaLoginExterno}
+          className="bg-blue-600 hover:bg-blue-700 text-white font-semibold py-2 px-6 rounded transition"
+        >
+          Ir para Login
+        </button>
+      </div>
     </main>
   );
 }

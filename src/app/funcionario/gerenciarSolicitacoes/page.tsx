@@ -25,28 +25,36 @@ export default function GerenciarSolicitacoes() {
   const [ordenarPorData, setOrdenarPorData] = useState<'ASC' | 'DESC'>('DESC');
   const [novaSolicitacao, setNovaSolicitacao] = useState<Partial<Solicitacao>>({});
   const [editandoSolicitacao, setEditandoSolicitacao] = useState<Partial<Solicitacao>>({});
+  const [solicitacoesOriginais, setSolicitacoesOriginais] = useState<Solicitacao[]>([]);
 
-  useEffect(() => {
-    setSolicitacoes([
-      {
-        id: 1,
-        usuarioId: 1,
-        remedioId: 2,
-        farmaciaId: 1,
-        justificativa: 'Dor de cabeça',
-        dataCriacao: '2024-07-12T10:00:00Z',
-      },
-      {
-        id: 2,
-        usuarioId: 2,
-        remedioId: 1,
-        farmaciaId: 2,
-        justificativa: 'Febre',
-        dataCriacao: '2024-07-13T09:00:00Z',
-      },
-    ]);
-  }, []);
+useEffect(() => {
+  const dadosIniciais = [
+    {
+      id: 1,
+      usuarioId: 1,
+      remedioId: 2,
+      farmaciaId: 1,
+      justificativa: 'Dor de cabeça',
+      dataCriacao: '2024-07-12T10:00:00Z',
+    },
+    {
+      id: 2,
+      usuarioId: 2,
+      remedioId: 1,
+      farmaciaId: 2,
+      justificativa: 'Febre',
+      dataCriacao: '2024-07-13T09:00:00Z',
+    },
+  ];
+  setSolicitacoes(dadosIniciais);
+  setSolicitacoesOriginais(dadosIniciais);
+}, []);
 
+    function restaurarLista() {
+    setSolicitacoes(solicitacoesOriginais);
+    setFiltroUsuarioId('');
+    setFiltroSolicitacaoId('');
+  }
   function buscarPorUsuario() {
     const resultado = solicitacoes.filter(
       (s) => s.usuarioId === Number(filtroUsuarioId)
@@ -125,6 +133,8 @@ export default function GerenciarSolicitacoes() {
             onChange={(e) => setFiltroUsuarioId(e.target.value)}
           />
           <Button onClick={buscarPorUsuario}>Buscar por Usuário</Button>
+
+           <Button onClick={restaurarLista}>Todos os registros</Button>
 
           <select
             className="border rounded px-3 py-2"
