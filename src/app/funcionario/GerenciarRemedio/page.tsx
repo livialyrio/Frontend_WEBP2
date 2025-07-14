@@ -1,429 +1,317 @@
 'use client';
 
-import Button from '@/components/button/Button';
-import TabelaFiltros from '@/components/tabela/TabelaFiltros';
+import { useEffect, useState } from 'react';
 import { InputTexto } from '@/components/ui/InputText';
-import { useState } from 'react';
+import Modal from '@/components/Modal_Simples/Modal';
+import Button from '@/components/button/Button';
 import { useRouter } from 'next/navigation';
+import type { Remedio } from '@/services/remedioService';
 
-interface Remedio {
-  id: number;
-  nome: string;
-  categoria: string;
-  principioAtivo: string;
-  dosagem: string;
-  fabricante: string;
+const PRINCIPIOS_ATIVOS = ['Paracetamol', 'Amoxicilina', 'Ibuprofeno'];
+const CATEGORIAS = ['Analgésico', 'Antibiótico', 'Anti-inflamatório'];
+
+interface RemedioEditando extends Partial<Remedio> {
+  campoParaAtualizar?: keyof Remedio;
 }
 
-export default function GerenciarRemedio() {
-  const [remedios, setRemedios] = useState<Remedio[]>([]);
-  const [mostrarNavbar, setMostrarNavbar] = useState(false);
-  const [nomeRemedio, setNomeRemedio] = useState('');
-  const [idRemedio, setIdRemedio] = useState('');
-  const [remedioSelecionado, setRemedioSelecionado] = useState<Remedio | null>(null);
-  const [adicionando, setAdicionando] = useState(false);
-  const [novoRemedio, setNovoRemedio] = useState('');
-  const [novaCategoria, setNovaCategoria] = useState('');
-  const [novoPrincipioAtivo, setNovoPrincipioAtivo] = useState('');
-  const [novaDosagem, setNovaDosagem] = useState('');
-  const [novoFabricante, setNovoFabricante] = useState('');
-  const [remedioAdicionado, setRemedioAdicionado] = useState<Remedio | null>(null);
-  const [listarTodos, setListarTodos] = useState(false);
-  const [listarCategoria, setListarCategoria] = useState(false);
-  const [categoriaSelecionada, setCategoriaSelecionada] = useState('');
-  const [remediosPorCategoria, setRemediosPorCategoria] = useState<Remedio[]>([]);
-  const [listarTodasCategorias, setListarTodasCategorias] = useState(false);
-  const [todasCategorias, setTodasCategorias] = useState<string[]>([]);
-  const [listarPorPrincipio, setListarPorPrincipio] = useState(false);
-  const [principioAtivo, setPrincipioAtivo] = useState('');
-  const [remediosPorPrincipio, setRemediosPorPrincipio] = useState<Remedio[]>([]);
-  const [editandoId, setEditandoId] = useState('');
-  const [editandoCampo, setEditandoCampo] = useState(''); 
-  const [novoValorCampo, setNovoValorCampo] = useState('');
-  const [remediosFiltrados, setRemediosFiltrados] = useState<Remedio[]>([]);
-  const [modo, setModo] = useState<'listarId' | 'atualizarCompleto' | 'atualizarPrincipio' | 'atualizarCategoria' | 'atualizarParcial' | 'remover' | null>(null);
-  const [mensagemAtualizacao, setMensagemAtualizacao] = useState('');
-
-  const resetDisplayStates = () => {
-    setMostrarNavbar(false);
-    setAdicionando(false);
-    setListarTodos(false);
-    setListarCategoria(false);
-    setListarTodasCategorias(false);
-    setListarPorPrincipio(false);
-    setRemediosFiltrados([]);
-    setRemedioSelecionado(null);
-    setModo(null);
-    setMensagemAtualizacao('');
-    setEditandoId('');
-    setEditandoCampo('');
-    setNovoValorCampo('');
-    setNovoRemedio('');
-    setNovaCategoria('');
-    setNovoPrincipioAtivo('');
-    setNovaDosagem('');
-    setNovoFabricante('');
-  };
-
-  const abrirListarUm = () => {
-    resetDisplayStates();
-    setMostrarNavbar(true);
-    setNomeRemedio('');
-    setRemedioSelecionado(null);
-  };
-
-  const abrirAdicionar = () => {
-    resetDisplayStates();
-    setAdicionando(true);
-    setRemedioAdicionado(null);
-  };
-
-  const abrirListarTodos = () => {
-    resetDisplayStates();
-    setListarTodos(true);
-  };
-
-  const abrirListarCategoria = () => {
-    resetDisplayStates();
-    setListarCategoria(true);
-    setCategoriaSelecionada('');
-    setRemediosPorCategoria([]);
-  };
-
-  const abrirListarTodasCategorias = () => {
-    resetDisplayStates();
-    setListarTodasCategorias(true);
-    setTodasCategorias([...new Set(remedios.map(r => r.categoria))]);
-  };
-
-  const abrirListarPorPrincipio = () => {
-    resetDisplayStates();
-    setListarPorPrincipio(true);
-    setPrincipioAtivo('');
-    setRemediosPorPrincipio([]);
-  };
-
-  const listarRemedioPorNome = () => {
-    const nomeBusca = nomeRemedio.trim().toLowerCase();
-    if (!nomeBusca) {
-      alert('Digite o nome do remédio para buscar.');
-      return;
-    }
-    const encontrado = remedios.find(r => r.nome.toLowerCase() === nomeBusca);
-    setRemedioSelecionado(encontrado || null);
-  };
-
-  const listarRemedioPorId = () => {
-    const id = parseInt(idRemedio);
-    if (isNaN(id)) {
-      alert('Digite um ID válido.');
-      return;
-    }
-    const resultado = remedios.find(r => r.id === id);
-    setRemediosFiltrados(resultado ? [resultado] : []);
-  };
-
-  const listarPorCategoria = () => {
-    const cat = categoriaSelecionada.trim().toLowerCase();
-    const filtrados = remedios.filter(r => r.categoria.toLowerCase() === cat);
-    setRemediosPorCategoria(filtrados);
-  };
-
-  const adicionarRemedio = () => {
-    if (!novoRemedio || !novaCategoria || !novoPrincipioAtivo || !novaDosagem || !novoFabricante) {
-      alert('Preencha todos os campos para adicionar um remédio.');
-      return;
-    }
-
-    const novoId = remedios.length > 0 ? Math.max(...remedios.map(r => r.id)) + 1 : 1;
-
-    const rem: Remedio = {
-      id: novoId,
-      nome: novoRemedio,
-      categoria: novaCategoria,
-      principioAtivo: novoPrincipioAtivo,
-      dosagem: novaDosagem,
-      fabricante: novoFabricante,
-    };
-
-    setRemedios([...remedios, rem]);
-    setRemedioAdicionado(rem);
-    setNovoRemedio('');
-    setNovaCategoria('');
-    setNovoPrincipioAtivo('');
-    setNovaDosagem('');
-    setNovoFabricante('');
-  };
-
-  const atualizarRemedioCompleto = () => {
-    const id = parseInt(editandoId);
-    if (isNaN(id)) {
-        alert('Por favor, insira um ID válido.');
-        return;
-    }
-    if (!novoRemedio || !novaCategoria || !novoPrincipioAtivo || !novaDosagem || !novoFabricante) {
-        alert('Por favor, preencha todos os campos para a atualização completa.');
-        return;
-    }
-
-    const index = remedios.findIndex(r => r.id === id);
-    if (index === -1) {
-      alert('Remédio não encontrado.');
-      return;
-    }
-
-    const atualizado: Remedio = {
-      id,
-      nome: novoRemedio,
-      categoria: novaCategoria,
-      principioAtivo: novoPrincipioAtivo,
-      dosagem: novaDosagem,
-      fabricante: novoFabricante,
-    };
-
-    const novosRemedios = [...remedios];
-    novosRemedios[index] = atualizado;
-    setRemedios(novosRemedios);
-    setMensagemAtualizacao(`Remédio ID ${id} atualizado com sucesso.`);
-  };
-
-  const atualizarCampoRemedio = (campo: keyof Remedio) => {
-    const id = parseInt(editandoId);
-    if (isNaN(id)) {
-        alert('Por favor, insira um ID válido.');
-        return;
-    }
-    if (!novoValorCampo) {
-        alert('Por favor, insira um novo valor para o campo.');
-        return;
-    }
-
-    const index = remedios.findIndex(r => r.id === id);
-    if (index === -1) {
-      alert('Remédio não encontrado.');
-      return;
-    }
-
-    const atualizados = [...remedios];
-
-    (atualizados[index] as any)[campo] = novoValorCampo;
-    setRemedios(atualizados);
-    setMensagemAtualizacao(`Campo "${campo}" do remédio ID ${id} atualizado com sucesso.`);
-  };
-
-  const removerRemedioPorId = () => {
-    const id = parseInt(editandoId);
-    if (isNaN(id)) {
-        alert('Por favor, insira um ID válido para remover.');
-        return;
-    }
-    const initialLength = remedios.length;
-    setRemedios(remedios.filter(r => r.id !== id));
-    if (remedios.length === initialLength) {
-        setMensagemAtualizacao(`Remédio ID ${id} não encontrado.`);
-    } else {
-        setMensagemAtualizacao(`Remédio ID ${id} removido com sucesso.`);
-    }
-  };
-
-  const remediosColumns = [
-    { header: 'ID', accessor: 'id' },
-    { header: 'Nome', accessor: 'nome' },
-    { header: 'Categoria', accessor: 'categoria' },
-    { header: 'Princípio Ativo', accessor: 'principioAtivo' },
-    { header: 'Dosagem', accessor: 'dosagem' },
-    { header: 'Fabricante', accessor: 'fabricante' },
-  ];
+export default function GerenciarRemedioPage() {
+  const [buscaId, setBuscaId] = useState('');
+  const [resultadoBusca, setResultadoBusca] = useState<Remedio | null>(null);
+  const [remedios, setRemedios] = useState<Remedio[]>([
+    { remedioId: 1, nome: 'Paracetamol', categoria: 'Analgésico', principio_ativo: 'Paracetamol', dosagem: '500mg', fabricante: 'MedPharma' },
+    { remedioId: 2, nome: 'Amoxicilina', categoria: 'Antibiótico', principio_ativo: 'Amoxicilina', dosagem: '250mg', fabricante: 'BioLabs' },
+    { remedioId: 3, nome: 'Ibuprofeno', categoria: 'Anti-inflamatório', principio_ativo: 'Ibuprofeno', dosagem: '400mg', fabricante: 'PharmaGen' }
+  ]);
+  const [modalAberto, setModalAberto] = useState(false);
+  const [modalEdicaoAberto, setModalEdicaoAberto] = useState(false);
+  const [modalItemAberto, setModalItemAberto] = useState(false);
+  const [remedioEditando, setRemedioEditando] = useState<RemedioEditando>({});
+  const [novoRemedio, setNovoRemedio] = useState<Partial<Remedio>>({});
+  const [filtroNome, setFiltroNome] = useState('');
+  const [filtroCategoria, setFiltroCategoria] = useState('');
+  const [tipoExibicao, setTipoExibicao] = useState<'remedios' | 'categorias' | 'principios'>('remedios');
+  const [dadosGenericos, setDadosGenericos] = useState<any[]>([]);
+  const [principiosAtivos, setPrincipiosAtivos] = useState<string[]>(PRINCIPIOS_ATIVOS);
+  const [categorias, setCategorias] = useState<string[]>(CATEGORIAS);
   const router = useRouter();
+
+  useEffect(() => {
+    buscarTodosRemedios();
+  }, []);
+
+  function buscarPorNome() {
+    const resultado = remedios.filter(r =>
+      r.nome.toLowerCase().includes(filtroNome.toLowerCase())
+    );
+    setTipoExibicao('remedios');
+    setDadosGenericos(resultado);
+  }
+
+  function buscarPorId() {
+    const id = Number(buscaId.trim());
+    if (!id) {
+      setDadosGenericos([]);
+      return;
+    }
+    const encontrado = remedios.find(r => r.remedioId === id);
+    setTipoExibicao('remedios');
+    setDadosGenericos(encontrado ? [encontrado] : []);
+  }
+
+  function buscarPorCategoria() {
+    const resultado = remedios.filter(r =>
+      (r.categoria ?? '').toLowerCase().includes(filtroCategoria.toLowerCase())
+    );
+    setTipoExibicao('remedios');
+    setDadosGenericos(resultado);
+  }
+
+  function buscarTodosRemedios() {
+    setTipoExibicao('remedios');
+    setDadosGenericos([...remedios]);
+  }
+
+  function buscarTodosPrincipiosAtivos() {
+    const lista = principiosAtivos.map((p, idx) => ({ id: idx + 1, valor: p }));
+    setTipoExibicao('principios');
+    setDadosGenericos(lista);
+  }
+
+  function buscarTodasCategorias() {
+    const lista = categorias.map((c, idx) => ({ id: idx + 1, valor: c }));
+    setTipoExibicao('categorias');
+    setDadosGenericos(lista);
+  }
+
+  function criarRemedio(e: React.FormEvent) {
+    e.preventDefault();
+    if (!novoRemedio.nome || !novoRemedio.categoria || !novoRemedio.principio_ativo || !novoRemedio.dosagem || !novoRemedio.fabricante) {
+      alert('Preencha todos os campos!');
+      return;
+    }
+    const novoId = remedios.length > 0 ? Math.max(...remedios.map(r => r.remedioId ?? 0)) + 1 : 1;
+    const novo: Remedio = {
+      remedioId: novoId,
+      nome: novoRemedio.nome,
+      categoria: novoRemedio.categoria,
+      principio_ativo: novoRemedio.principio_ativo,
+      dosagem: novoRemedio.dosagem,
+      fabricante: novoRemedio.fabricante
+    };
+
+    const novaLista = [...remedios, novo];
+    setRemedios(novaLista);
+    setDadosGenericos(novaLista);
+
+    if (novo.principio_ativo && !principiosAtivos.includes(novo.principio_ativo)) {
+      setPrincipiosAtivos([...principiosAtivos, novo.principio_ativo]);
+    }
+  
+    if (novo.categoria && !categorias.includes(novo.categoria)) {
+      setCategorias([...categorias, novo.categoria]);
+    }
+    setNovoRemedio({});
+    setModalAberto(false);
+  }
+
+  function removerRemedio(remedioId?: number) {
+    const novaLista = remedios.filter(r => r.remedioId !== remedioId);
+    setRemedios(novaLista);
+    setDadosGenericos(novaLista);
+  }
+
+  function salvarEdicaoCompleta(e: React.FormEvent) {
+    e.preventDefault();
+    if (!remedioEditando.remedioId || !remedioEditando.nome || !remedioEditando.categoria || !remedioEditando.principio_ativo || !remedioEditando.dosagem || !remedioEditando.fabricante) {
+      alert('Preencha todos os campos!');
+      return;
+    }
+    setRemedios(prev =>
+      prev.map(r => r.remedioId === remedioEditando.remedioId ? { ...r, ...remedioEditando } as Remedio : r)
+    );
+    setDadosGenericos(remedios.map(r => r.remedioId === remedioEditando.remedioId ? { ...r, ...remedioEditando } as Remedio : r));
+    setModalEdicaoAberto(false);
+  }
+
+  function salvarEdicaoItem(e: React.FormEvent) {
+    e.preventDefault();
+    if (!remedioEditando.remedioId || !remedioEditando.campoParaAtualizar) {
+      alert('Selecione o campo e insira o novo valor!');
+      return;
+    }
+    const valorNovo = remedioEditando[remedioEditando.campoParaAtualizar];
+    if (!valorNovo) {
+      alert('Insira o novo valor!');
+      return;
+    }
+    setRemedios(prev =>
+      prev.map(r =>
+        r.remedioId === remedioEditando.remedioId
+          ? { ...r, [remedioEditando.campoParaAtualizar!]: valorNovo }
+          : r
+      )
+    );
+    setDadosGenericos(remedios.map(r =>
+      r.remedioId === remedioEditando.remedioId
+        ? { ...r, [remedioEditando.campoParaAtualizar!]: valorNovo }
+        : r
+    ));
+    setModalItemAberto(false);
+  }
+
   return (
-    <main className="min-h-screen bg-white p-6">
-      
-      <div className="max-w-7xl mx-auto">
-        <header className="mb-6 flex items-center justify-between">
+    <main className="min-h-screen bg-gradient-to-br from-[#f8fcff] via-[#dceafd] to-[#9eb8dc] p-6">
+      <div className="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        {/* ...existing code... */}
+        <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-blue-900">Gerenciar Remédios</h1>
-        </header>
+          <Button onClick={() => setModalAberto(true)}>Criar Remédio</Button>
+          <Button onClick={() => router.push('/funcionario')}>Voltar</Button>
+        </div>
 
-        <section className="mb-4 flex gap-4 items-center flex-wrap">
-          <Button className="bg-blue-700 hover:bg-blue-800" onClick={abrirListarTodos}>Listar Todos os Remédios</Button>
-          <Button onClick={abrirListarUm}>Listar um Remédio</Button>
-          <Button onClick={abrirAdicionar}>Adicionar Remédio</Button>
-          <Button onClick={abrirListarCategoria}>Listar uma Categoria de Remédios</Button>
-          <Button onClick={abrirListarTodasCategorias}>Listar Todas as Categorias</Button>
-          <Button onClick={() => { resetDisplayStates(); setModo('listarId'); }}>Listar por ID</Button>
-          <Button onClick={abrirListarPorPrincipio}>Listar Remédios por Princípio Ativo</Button>
-          <Button onClick={() => { resetDisplayStates(); setModo('atualizarCompleto'); }}>Atualizar completo</Button>
-          <Button onClick={() => { resetDisplayStates(); setModo('atualizarPrincipio'); }}>Atualizar princípio ativo</Button>
-          <Button onClick={() => { resetDisplayStates(); setModo('atualizarCategoria'); }}>Atualizar categoria</Button>
-          <Button onClick={() => { resetDisplayStates(); setModo('atualizarParcial'); }}>Atualizar remédio parcial por ID</Button>
-          <Button onClick={() => { resetDisplayStates(); setModo('remover'); }}>Remover por ID</Button>
-        </section>
+        {/* Filtros principais: nome, categoria, id */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          <InputTexto placeholder="Buscar por ID" value={buscaId} onChange={e => setBuscaId(e.target.value)} />
+          <Button onClick={buscarPorId}>Buscar por ID</Button>
 
-        {mensagemAtualizacao && (
-          <div className="bg-green-100 text-green-700 p-2 rounded mb-4 max-w-xl mx-auto">
-            {mensagemAtualizacao}
+          <InputTexto placeholder="Buscar por nome" value={filtroNome} onChange={(e) => setFiltroNome(e.target.value)} />
+          <Button onClick={buscarPorNome}>Buscar por Nome</Button>
+
+          <InputTexto placeholder="Buscar por categoria" value={filtroCategoria} onChange={(e) => setFiltroCategoria(e.target.value)} />
+          <Button onClick={buscarPorCategoria}>Buscar por Categoria</Button>
+        </div>
+
+        {/* Resultado da busca por ID */}
+        {resultadoBusca && (
+          <div className="mb-6 bg-blue-50 p-4 rounded shadow">
+            <h3 className="font-bold text-blue-800 mb-2">Resultado da Busca:</h3>
+            <div><b>ID:</b> {resultadoBusca.remedioId}</div>
+            <div><b>Nome:</b> {resultadoBusca.nome}</div>
+            <div><b>Categoria:</b> {resultadoBusca.categoria}</div>
+            <div><b>Princípio Ativo:</b> {resultadoBusca.principio_ativo}</div>
+            <div><b>Dosagem:</b> {resultadoBusca.dosagem}</div>
+            <div><b>Fabricante:</b> {resultadoBusca.fabricante}</div>
           </div>
         )}
 
+        {/* Ações extras */}
+        <div className="flex flex-wrap gap-4 mb-6">
+          <Button onClick={buscarTodosRemedios}>Listar Todos os Remédios</Button>
+          <Button onClick={buscarTodosPrincipiosAtivos}>Listar Todos os Princípios Ativos</Button>
+          <Button onClick={buscarTodasCategorias}>Listar Todas as Categorias</Button>
+        </div>
 
-        {mostrarNavbar && (
-          <section className="mb-4">
-            <InputTexto value={nomeRemedio} onChange={e => setNomeRemedio(e.target.value)} placeholder="Nome do remédio" />
-            <Button className="mt-2" onClick={listarRemedioPorNome}>Buscar</Button>
-            {remedioSelecionado ? (
-              <TabelaFiltros data={[remedioSelecionado]} columns={remediosColumns} />
-            ) : nomeRemedio.trim() !== '' ? (
-              <p className="mt-2 text-red-600">Remédio não encontrado.</p>
-            ) : null}
-          </section>
-        )}
-        {modo === 'listarId' && (
-          <section className="mb-4">
-            <InputTexto value={idRemedio} onChange={e => setIdRemedio(e.target.value)} placeholder="ID do remédio" />
-            <Button className="mt-2" onClick={listarRemedioPorId}>Buscar</Button>
-            {remediosFiltrados.length > 0 && (
-              <TabelaFiltros data={remediosFiltrados} columns={remediosColumns} />
-            )}
-            {idRemedio.trim() !== '' && remediosFiltrados.length === 0 && (
-                <p className="mt-2 text-red-600">Remédio com ID {idRemedio} não encontrado.</p>
-            )}
-          </section>
-        )}
-
-
-        {listarPorPrincipio && (
-          <section className="mb-4">
-            <InputTexto value={principioAtivo} onChange={e => setPrincipioAtivo(e.target.value)} placeholder="Princípio Ativo" />
-            <Button className="mt-2" onClick={() => {
-              const filtrados = remedios.filter(r =>
-                r.principioAtivo.toLowerCase().includes(principioAtivo.toLowerCase())
-              );
-              setRemediosPorPrincipio(filtrados);
-            }}>Buscar</Button>
-            {principioAtivo.trim() !== '' && remediosPorPrincipio.length === 0 && (
-                <p className="mt-2 text-red-600">Nenhum remédio encontrado com o princípio ativo "{principioAtivo}".</p>
-            )}
-            {remediosPorPrincipio.length > 0 && (
-              <TabelaFiltros data={remediosPorPrincipio} columns={remediosColumns} />
-            )}
-          </section>
-        )}
-
-
-        {listarCategoria && (
-          <section className="mb-4">
-            <InputTexto value={categoriaSelecionada} onChange={e => setCategoriaSelecionada(e.target.value)} placeholder="Nome da Categoria" />
-            <Button className="mt-2" onClick={listarPorCategoria}>Buscar</Button>
-            {categoriaSelecionada.trim() !== '' && remediosPorCategoria.length === 0 && (
-                <p className="mt-2 text-red-600">Nenhum remédio encontrado para a categoria "{categoriaSelecionada}".</p>
-            )}
-            {remediosPorCategoria.length > 0 && (
-              <TabelaFiltros data={remediosPorCategoria} columns={remediosColumns} />
-            )}
-          </section>
-        )}
-
-
-        {listarTodasCategorias && (
-          <section className="mb-4">
-            <div className="bg-gray-100 p-4 rounded">
-              <h2 className="text-lg font-bold text-blue-800 mb-2">Todas as Categorias:</h2>
-              <ul className="list-disc list-inside">
-                {todasCategorias.map(cat => (
-                  <li key={cat}>{cat}</li>
-                ))}
-                {todasCategorias.length === 0 && (
-                  <li>Nenhuma categoria cadastrada.</li>
-                )}
-              </ul>
-            </div>
-          </section>
-        )}
-
-
-        {adicionando && (
-          <section className="mb-4 grid grid-cols-2 gap-4 max-w-lg">
-            <InputTexto value={novoRemedio} onChange={e => setNovoRemedio(e.target.value)} placeholder="Nome" />
-            <InputTexto value={novaCategoria} onChange={e => setNovaCategoria(e.target.value)} placeholder="Categoria" />
-            <InputTexto value={novoPrincipioAtivo} onChange={e => setNovoPrincipioAtivo(e.target.value)} placeholder="Princípio Ativo" />
-            <InputTexto value={novaDosagem} onChange={e => setNovaDosagem(e.target.value)} placeholder="Dosagem" />
-            <InputTexto value={novoFabricante} onChange={e => setNovoFabricante(e.target.value)} placeholder="Fabricante" />
-            <Button className="col-span-2" onClick={adicionarRemedio}>Adicionar</Button>
-            {remedioAdicionado && (
-              <p className="col-span-2 text-green-600 mt-2">
-                Remédio "{remedioAdicionado.nome}" adicionado com sucesso! (ID: {remedioAdicionado.id})
-              </p>
-            )}
-          </section>
-        )}
-
-
-        {modo === 'atualizarCompleto' && (
-          <section className="mb-4 grid grid-cols-2 gap-4">
-            <InputTexto value={editandoId} onChange={e => setEditandoId(e.target.value)} placeholder="ID do remédio a atualizar" />
-            <InputTexto value={novoRemedio} onChange={e => setNovoRemedio(e.target.value)} placeholder="Novo Nome" />
-            <InputTexto value={novaCategoria} onChange={e => setNovaCategoria(e.target.value)} placeholder="Nova Categoria" />
-            <InputTexto value={novoPrincipioAtivo} onChange={e => setNovoPrincipioAtivo(e.target.value)} placeholder="Novo Princípio Ativo" />
-            <InputTexto value={novaDosagem} onChange={e => setNovaDosagem(e.target.value)} placeholder="Nova Dosagem" />
-            <InputTexto value={novoFabricante} onChange={e => setNovoFabricante(e.target.value)} placeholder="Novo Fabricante" />
-            <Button className="col-span-2" onClick={atualizarRemedioCompleto}>Atualizar Remédio Completo</Button>
-          </section>
-        )}
-
-
-        {modo === 'atualizarPrincipio' && (
-          <section className="mb-4 grid grid-cols-2 gap-4">
-            <InputTexto value={editandoId} onChange={e => setEditandoId(e.target.value)} placeholder="ID do remédio" />
-            <InputTexto value={novoValorCampo} onChange={e => setNovoValorCampo(e.target.value)} placeholder="Novo Princípio Ativo" />
-            <Button className="col-span-2" onClick={() => atualizarCampoRemedio('principioAtivo')}>Atualizar</Button>
-          </section>
-        )}
-
-
-        {modo === 'atualizarCategoria' && (
-          <section className="mb-4 grid grid-cols-2 gap-4">
-            <InputTexto value={editandoId} onChange={e => setEditandoId(e.target.value)} placeholder="ID do remédio" />
-            <InputTexto value={novoValorCampo} onChange={e => setNovoValorCampo(e.target.value)} placeholder="Nova Categoria" />
-            <Button className="col-span-2" onClick={() => atualizarCampoRemedio('categoria')}>Atualizar</Button>
-          </section>
-        )}
-
-
-        {modo === 'atualizarParcial' && (
-          <section className="mb-4 grid grid-cols-2 gap-4">
-            <InputTexto value={editandoId} onChange={e => setEditandoId(e.target.value)} placeholder="ID do remédio" />
-
-            <InputTexto value={novoValorCampo} onChange={e => setNovoValorCampo(e.target.value)} placeholder="Novo valor" />
-
-            <Button className="col-span-2" onClick={() => {
-                if (!editandoCampo || !Object.keys(remedios[0] || {}).includes(editandoCampo)) {
-                    alert('Por favor, defina qual campo será atualizado (ex: nome, dosagem, fabricante).');
-                    return;
-                }
-                atualizarCampoRemedio(editandoCampo as keyof Remedio);
-            }}>Atualizar</Button>
-          </section>
-        )}
-
-        {modo === 'remover' && (
-          <section className="mb-4 grid grid-cols-2 gap-4">
-            <InputTexto value={editandoId} onChange={e => setEditandoId(e.target.value)} placeholder="ID do remédio" />
-            <Button className="col-span-2" onClick={removerRemedioPorId}>Remover</Button>
-          </section>
-        )}
-
-
-        {listarTodos && (
-          <section className="mb-4">
-            <div className="bg-gray-100 p-4 rounded">
-              <h2 className="text-lg font-bold text-blue-800 mb-2">Todos os remédios cadastrados:</h2>
-              {remedios.length > 0 ? (
-                <TabelaFiltros data={remedios} columns={remediosColumns} />
-              ) : (
-                <p className="text-gray-700">Nenhum remédio cadastrado.</p>
+        <table className="w-full text-left bg-white border">
+          <thead className="bg-gray-100 text-blue-800">
+            <tr>
+              {tipoExibicao === 'remedios' && (
+                <>
+                  <th className="p-2">ID</th>
+                  <th className="p-2">Nome</th>
+                  <th className="p-2">Categoria</th>
+                  <th className="p-2">Princípio Ativo</th>
+                  <th className="p-2">Dosagem</th>
+                  <th className="p-2">Fabricante</th>
+                  <th className="p-2">Ações</th>
+                </>
               )}
-            </div>
-          </section>
-        )}
+              {(tipoExibicao === 'categorias' || tipoExibicao === 'principios') && (
+                <>
+                  <th className="p-2">ID</th>
+                  <th className="p-2">{tipoExibicao === 'categorias' ? 'Categoria' : 'Princípio Ativo'}</th>
+                </>
+              )}
+            </tr>
+          </thead>
+          <tbody>
+            {tipoExibicao === 'remedios' && dadosGenericos.map((r: Remedio) => (
+              <tr key={r.remedioId} className="border-t hover:bg-blue-50">
+                <td className="p-2">{r.remedioId}</td>
+                <td className="p-2">{r.nome}</td>
+                <td className="p-2">{r.categoria}</td>
+                <td className="p-2">{r.principio_ativo}</td>
+                <td className="p-2">{r.dosagem}</td>
+                <td className="p-2">{r.fabricante}</td>
+                <td className="p-2">
+                  <select onChange={(e) => {
+                    const opcao = e.target.value;
+                    setRemedioEditando(r);
+                    if (opcao === 'editarItem') setModalItemAberto(true);
+                    else if (opcao === 'editarCompleto') setModalEdicaoAberto(true);
+                    else if (opcao === 'remover') removerRemedio(r.remedioId);
+                  }} defaultValue="" className="border rounded px-2 py-1">
+                    <option value="" disabled>Ações</option>
+                    <option value="editarItem">Editar campo específico</option>
+                    <option value="editarCompleto">Editar por completo</option>
+                    <option value="remover">Remover</option>
+                  </select>
+                </td>
+              </tr>
+            ))}
+            {(tipoExibicao === 'categorias' || tipoExibicao === 'principios') && dadosGenericos.map((item) => (
+              <tr key={item.id} className="border-t hover:bg-blue-50">
+                <td className="p-2">{item.id}</td>
+                <td className="p-2">{item.valor}</td>
+              </tr>
+            ))}
+          </tbody>
+        </table>
+
+        {/* Os modais devem ser incluídos aqui como no exemplo anterior */}
+        {/* Modal Criar Remédio */}
+        <Modal isOpen={modalAberto} onClose={() => setModalAberto(false)} title="Criar Remédio">
+          <form onSubmit={criarRemedio} className="space-y-4">
+            <InputTexto placeholder="Nome" value={novoRemedio.nome || ''} onChange={e => setNovoRemedio({ ...novoRemedio, nome: e.target.value })} />
+            <InputTexto placeholder="Categoria" value={novoRemedio.categoria || ''} onChange={e => setNovoRemedio({ ...novoRemedio, categoria: e.target.value })} />
+            <InputTexto placeholder="Princípio Ativo" value={novoRemedio.principio_ativo || ''} onChange={e => setNovoRemedio({ ...novoRemedio, principio_ativo: e.target.value })} />
+            <InputTexto placeholder="Dosagem" value={novoRemedio.dosagem || ''} onChange={e => setNovoRemedio({ ...novoRemedio, dosagem: e.target.value })} />
+            <InputTexto placeholder="Fabricante" value={novoRemedio.fabricante || ''} onChange={e => setNovoRemedio({ ...novoRemedio, fabricante: e.target.value })} />
+            <Button type="submit">Criar</Button>
+          </form>
+        </Modal>
+
+        {/* Modal Editar Remédio Completo */}
+        <Modal isOpen={modalEdicaoAberto} onClose={() => setModalEdicaoAberto(false)} title="Editar Remédio por Completo">
+          <form onSubmit={salvarEdicaoCompleta} className="space-y-4">
+            <InputTexto placeholder="ID" value={remedioEditando.remedioId || ''} readOnly disabled className="bg-gray-100 cursor-not-allowed" />
+            <InputTexto placeholder="Nome" value={remedioEditando.nome || ''} onChange={e => setRemedioEditando({ ...remedioEditando, nome: e.target.value })} />
+            <InputTexto placeholder="Categoria" value={remedioEditando.categoria || ''} onChange={e => setRemedioEditando({ ...remedioEditando, categoria: e.target.value })} />
+            <InputTexto placeholder="Princípio Ativo" value={remedioEditando.principio_ativo || ''} onChange={e => setRemedioEditando({ ...remedioEditando, principio_ativo: e.target.value })} />
+            <InputTexto placeholder="Dosagem" value={remedioEditando.dosagem || ''} onChange={e => setRemedioEditando({ ...remedioEditando, dosagem: e.target.value })} />
+            <InputTexto placeholder="Fabricante" value={remedioEditando.fabricante || ''} onChange={e => setRemedioEditando({ ...remedioEditando, fabricante: e.target.value })} />
+            <Button type="submit">Salvar</Button>
+          </form>
+        </Modal>
+
+        {/* Modal Editar Campo Específico */}
+        <Modal isOpen={modalItemAberto} onClose={() => setModalItemAberto(false)} title="Editar Campo Específico">
+          <form onSubmit={salvarEdicaoItem} className="space-y-4">
+            <InputTexto placeholder="ID" value={remedioEditando.remedioId || ''} readOnly disabled className="bg-gray-100 cursor-not-allowed" />
+            <select
+              value={remedioEditando.campoParaAtualizar || ''}
+              onChange={e => setRemedioEditando({ ...remedioEditando, campoParaAtualizar: e.target.value as keyof Remedio })}
+              className="border rounded px-3 py-2 w-full focus:ring-blue-500 focus:border-blue-500"
+            >
+              <option value="" disabled>Selecione o campo a atualizar</option>
+              <option value="nome">Nome</option>
+              <option value="categoria">Categoria</option>
+              <option value="principio_ativo">Princípio Ativo</option>
+              <option value="dosagem">Dosagem</option>
+              <option value="fabricante">Fabricante</option>
+            </select>
+            {remedioEditando.campoParaAtualizar && (
+              <InputTexto
+                placeholder={`Novo valor para ${remedioEditando.campoParaAtualizar}`}
+                value={remedioEditando[remedioEditando.campoParaAtualizar] !== undefined ? String(remedioEditando[remedioEditando.campoParaAtualizar]) : ''}
+                onChange={e => setRemedioEditando({
+                  ...remedioEditando,
+                  [remedioEditando.campoParaAtualizar!]: e.target.value
+                })}
+              />
+            )}
+            <Button type="submit" disabled={!remedioEditando.campoParaAtualizar}>Salvar</Button>
+          </form>
+        </Modal>
       </div>
     </main>
   );

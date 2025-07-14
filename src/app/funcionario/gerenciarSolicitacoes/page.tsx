@@ -5,15 +5,15 @@ import { InputTexto } from '@/components/ui/InputText';
 import Modal from '@/components/Modal_Simples/Modal';
 import Button from '@/components/button/Button';
 import { useRouter } from 'next/navigation';
+import Alert from '@/components/alertas/alerta';
 
-interface Solicitacao {
-  id: number;
-  usuarioId: number;
-  remedioId: number;
-  farmaciaId: number;
-  justificativa: string;
-  dataCriacao: string;
-}
+import {
+  listarSolicitacoes,
+  criarSolicitacao,
+  atualizarSolicitacao,
+  removerSolicitacao,
+} from '@/services/solicitacoesService'; 
+import { Solicitacao, CriarSolicitacaoPayload } from '@/services/solicitacoesService';
 
 export default function GerenciarSolicitacoes() {
   const router = useRouter();
@@ -23,50 +23,111 @@ export default function GerenciarSolicitacoes() {
   const [filtroUsuarioId, setFiltroUsuarioId] = useState('');
   const [filtroSolicitacaoId, setFiltroSolicitacaoId] = useState('');
   const [ordenarPorData, setOrdenarPorData] = useState<'ASC' | 'DESC'>('DESC');
-  const [novaSolicitacao, setNovaSolicitacao] = useState<Partial<Solicitacao>>({});
-  const [editandoSolicitacao, setEditandoSolicitacao] = useState<Partial<Solicitacao>>({});
-  const [solicitacoesOriginais, setSolicitacoesOriginais] = useState<Solicitacao[]>([]);
+  const [novaSolicitacao, setNovaSolicitacao] = useState<CriarSolicitacaoPayload>({
+    usuarioId: 0,
+    remedioId: 0,
+    farmaciaId: 0,
+    justificativa: '',
+  });
+  const [editandoSolicitacao, setEditandoSolicitacao] = useState<Solicitacao | null>(null);
+  const [erro, setErro] = useState<string | null>(null);
+  const [alerta, setAlerta] = useState<string | null>(null);
 
-useEffect(() => {
-  const dadosIniciais = [
-    {
-      id: 1,
-      usuarioId: 1,
-      remedioId: 2,
-      farmaciaId: 1,
-      justificativa: 'Dor de cabeça',
-      dataCriacao: '2024-07-12T10:00:00Z',
-    },
-    {
-      id: 2,
-      usuarioId: 2,
-      remedioId: 1,
-      farmaciaId: 2,
-      justificativa: 'Febre',
-      dataCriacao: '2024-07-13T09:00:00Z',
-    },
-  ];
-  setSolicitacoes(dadosIniciais);
-  setSolicitacoesOriginais(dadosIniciais);
-}, []);
 
-    function restaurarLista() {
-    setSolicitacoes(solicitacoesOriginais);
-    setFiltroUsuarioId('');
-    setFiltroSolicitacaoId('');
+  useEffect(() => {
+    async function carregarSolicitacoes() {
+      try {
+        const token = localStorage.getItem('token') || '';
+        const dados = await listarSolicitacoes(token);
+        setSolicitacoes(dados);
+      } catch (err: any) {
+        console.error('Erro ao carregar solicitações:', err);
+        setErro('Erro ao carregar solicitações. Verifique sua autenticação.'); 
+      }
+    }
+    carregarSolicitacoes();
+  }, []);
+
+  async function criar(e: React.FormEvent) {
+    e.preventDefault();
+
+    const { usuarioId, remedioId, farmaciaId, justificativa } = novaSolicitacao;
+    if (!usuarioId || !remedioId || !farmaciaId || !justificativa.trim()) {
+      setAlerta('Todos os campos são obrigatórios.');
+      return;
+    }
+
+    try {
+      const token = localStorage.getItem('token') || '';
+      const nova = await criarSolicitacao(novaSolicitacao, token);
+      setSolicitacoes([...solicitacoes, nova]);
+      setModalAberto(false);
+      setNovaSolicitacao({ usuarioId: 0, remedioId: 0, farmaciaId: 0, justificativa: '' });
+      setErro(null);
+      setAlerta(null);
+    } catch (err: any) {
+      console.error('Erro ao criar solicitação:', err);
+      setErro('Erro ao criar solicitação.');
+    }
   }
-  function buscarPorUsuario() {
-    const resultado = solicitacoes.filter(
-      (s) => s.usuarioId === Number(filtroUsuarioId)
-    );
-    setSolicitacoes(resultado);
+
+  async function salvarEdicao(e: React.FormEvent) {
+    e.preventDefault();
+    if (!editandoSolicitacao) return;
+    try {
+      const token = localStorage.getItem('token') || '';
+      const atualizada = await atualizarSolicitacao(editandoSolicitacao.id, editandoSolicitacao, token);
+      setSolicitacoes(prev => prev.map(s => s.id === atualizada.id ? atualizada : s));
+      setModalEdicaoAberto(false);
+      setErro(null);
+    } catch (err: any) {
+      console.error('Erro ao editar:', err);
+      setErro('Erro ao editar solicitação.');
+    }
   }
 
-  function buscarPorSolicitacaoId() {
-    const resultado = solicitacoes.filter(
-      (s) => s.id === Number(filtroSolicitacaoId)
-    );
-    setSolicitacoes(resultado);
+  async function remover(id: number) {
+    try {
+      const token = localStorage.getItem('token') || '';
+      await removerSolicitacao(id, token);
+      setSolicitacoes(prev => prev.filter(s => s.id !== id));
+    setErro(null); 
+    } catch (err: any) {
+      console.error('Erro ao remover:', err);
+      setErro('Erro ao remover solicitação.');
+    }
+  }
+
+async function buscarPorUsuario() {
+    try {
+      const token = localStorage.getItem('token') || '';
+      const res = await fetch(`http://localhost:3001/solicitacoes/usuario/${filtroUsuarioId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Erro ao buscar por usuário');
+      const data = await res.json();
+      setSolicitacoes(data);
+      setErro(null); 
+    } catch (err: any) {
+      console.error('Erro ao buscar por usuário:', err);
+      setErro(err.message || 'Erro ao buscar por usuário');
+    }
+  }
+
+  async function buscarPorSolicitacaoId() {
+    try {
+      const token = localStorage.getItem('token') || '';
+      const res = await fetch(`http://localhost:3001/solicitacoes/${filtroSolicitacaoId}`, {
+        headers: { Authorization: `Bearer ${token}` },
+      });
+      if (!res.ok) throw new Error('Erro ao buscar por ID da solicitação');
+      const data = await res.json();
+      setSolicitacoes([data]); 
+      setErro(null);
+    } catch (err: any) {
+      console.error('Erro ao buscar por ID da solicitação:', err);
+      setErro(err.message || 'Erro ao buscar por ID da solicitação');
+    }
   }
 
   function ordenarPorDataFunc() {
@@ -76,36 +137,6 @@ useEffect(() => {
         : new Date(b.dataCriacao).getTime() - new Date(a.dataCriacao).getTime();
     });
     setSolicitacoes(ordenado);
-  }
-
-  function criarSolicitacao(e: React.FormEvent) {
-    e.preventDefault();
-    const nova: Solicitacao = {
-      id: solicitacoes.length + 1,
-      usuarioId: Number(novaSolicitacao.usuarioId),
-      remedioId: Number(novaSolicitacao.remedioId),
-      farmaciaId: Number(novaSolicitacao.farmaciaId),
-      justificativa: novaSolicitacao.justificativa || '',
-      dataCriacao: new Date().toISOString(),
-    };
-    setSolicitacoes([...solicitacoes, nova]);
-    setModalAberto(false);
-  }
-
-  function salvarEdicao(e: React.FormEvent) {
-    e.preventDefault();
-    setSolicitacoes((prev) =>
-      prev.map((s) =>
-        s.id === editandoSolicitacao.id
-          ? { ...s, ...editandoSolicitacao } as Solicitacao
-          : s
-      )
-    );
-    setModalEdicaoAberto(false);
-  }
-
-  function removerSolicitacao(id: number) {
-    setSolicitacoes(solicitacoes.filter((s) => s.id !== id));
   }
 
   return (
@@ -118,6 +149,10 @@ useEffect(() => {
             <Button onClick={() => router.push('/funcionario')}>Voltar</Button>
           </div>
         </div>
+
+        {erro && (
+          <Alert variant="error">{erro}</Alert>
+        )}
 
         <div className="flex flex-wrap gap-4 mb-6">
           <InputTexto
@@ -134,7 +169,7 @@ useEffect(() => {
           />
           <Button onClick={buscarPorUsuario}>Buscar por Usuário</Button>
 
-           <Button onClick={restaurarLista}>Todos os registros</Button>
+          <Button onClick={() => window.location.reload()}>Todos os registros</Button>
 
           <select
             className="border rounded px-3 py-2"
@@ -174,9 +209,12 @@ useEffect(() => {
                   <select
                     onChange={(e) => {
                       const opcao = e.target.value;
-                      setEditandoSolicitacao(s);
-                      if (opcao === 'editar') setModalEdicaoAberto(true);
-                      else if (opcao === 'remover') removerSolicitacao(s.id);
+                      if (opcao === 'editar') {
+                        setEditandoSolicitacao(s);
+                        setModalEdicaoAberto(true);
+                      } else if (opcao === 'remover') {
+                        remover(s.id);
+                      }
                     }}
                     defaultValue=""
                     className="border rounded px-2 py-1"
@@ -191,24 +229,55 @@ useEffect(() => {
           </tbody>
         </table>
 
-        <Modal isOpen={modalAberto} onClose={() => setModalAberto(false)} title="Nova Solicitação">
-          <form onSubmit={criarSolicitacao} className="space-y-4">
-            <InputTexto placeholder="ID do usuário" onChange={(e) => setNovaSolicitacao({ ...novaSolicitacao, usuarioId: Number(e.target.value) })} />
-            <InputTexto placeholder="ID do remédio" onChange={(e) => setNovaSolicitacao({ ...novaSolicitacao, remedioId: Number(e.target.value) })} />
-            <InputTexto placeholder="ID da farmácia" onChange={(e) => setNovaSolicitacao({ ...novaSolicitacao, farmaciaId: Number(e.target.value) })} />
-            <InputTexto placeholder="Justificativa" onChange={(e) => setNovaSolicitacao({ ...novaSolicitacao, justificativa: e.target.value })} />
+ <Modal isOpen={modalAberto} onClose={() => setModalAberto(false)} title="Nova Solicitação">
+          <form onSubmit={criar} className="space-y-4">
+            {alerta && <Alert variant="warning">{alerta}</Alert>}
+            <InputTexto
+              placeholder="ID do usuário"
+              onChange={(e) => setNovaSolicitacao({ ...novaSolicitacao, usuarioId: Number(e.target.value) })}
+            />
+            <InputTexto
+              placeholder="ID do remédio"
+              onChange={(e) => setNovaSolicitacao({ ...novaSolicitacao, remedioId: Number(e.target.value) })}
+            />
+            <InputTexto
+              placeholder="ID da farmácia"
+              onChange={(e) => setNovaSolicitacao({ ...novaSolicitacao, farmaciaId: Number(e.target.value) })}
+            />
+            <InputTexto
+              placeholder="Justificativa"
+              onChange={(e) => setNovaSolicitacao({ ...novaSolicitacao, justificativa: e.target.value })}
+            />
             <Button type="submit">Salvar</Button>
           </form>
         </Modal>
 
         <Modal isOpen={modalEdicaoAberto} onClose={() => setModalEdicaoAberto(false)} title="Editar Solicitação">
-          <form onSubmit={salvarEdicao} className="space-y-4">
-            <InputTexto placeholder="ID do usuário" value={editandoSolicitacao.usuarioId?.toString()} onChange={(e) => setEditandoSolicitacao({ ...editandoSolicitacao, usuarioId: Number(e.target.value) })} />
-            <InputTexto placeholder="ID do remédio" value={editandoSolicitacao.remedioId?.toString()} onChange={(e) => setEditandoSolicitacao({ ...editandoSolicitacao, remedioId: Number(e.target.value) })} />
-            <InputTexto placeholder="ID da farmácia" value={editandoSolicitacao.farmaciaId?.toString()} onChange={(e) => setEditandoSolicitacao({ ...editandoSolicitacao, farmaciaId: Number(e.target.value) })} />
-            <InputTexto placeholder="Justificativa" value={editandoSolicitacao.justificativa || ''} onChange={(e) => setEditandoSolicitacao({ ...editandoSolicitacao, justificativa: e.target.value })} />
-            <Button type="submit">Salvar Alterações</Button>
-          </form>
+          {editandoSolicitacao && (
+            <form onSubmit={salvarEdicao} className="space-y-4">
+              <InputTexto
+                placeholder="ID do usuário"
+                value={editandoSolicitacao.usuarioId.toString()}
+                onChange={(e) => setEditandoSolicitacao({ ...editandoSolicitacao, usuarioId: Number(e.target.value) })}
+              />
+              <InputTexto
+                placeholder="ID do remédio"
+                value={editandoSolicitacao.remedioId.toString()}
+                onChange={(e) => setEditandoSolicitacao({ ...editandoSolicitacao, remedioId: Number(e.target.value) })}
+              />
+              <InputTexto
+                placeholder="ID da farmácia"
+                value={editandoSolicitacao.farmaciaId.toString()}
+                onChange={(e) => setEditandoSolicitacao({ ...editandoSolicitacao, farmaciaId: Number(e.target.value) })}
+              />
+              <InputTexto
+                placeholder="Justificativa"
+                value={editandoSolicitacao.justificativa}
+                onChange={(e) => setEditandoSolicitacao({ ...editandoSolicitacao, justificativa: e.target.value })}
+              />
+              <Button type="submit">Salvar Alterações</Button>
+            </form>
+          )}
         </Modal>
       </div>
     </main>
