@@ -118,7 +118,7 @@ export default function GerenciarFarmacias() {
          <Button onClick={() => router.push('/funcionario')}>Voltar</Button>
         </div>
 
-    {/* Botões e filtros */}
+
         <div className="flex flex-wrap gap-4 mb-6">
           <InputTexto
             placeholder="Buscar por bairro"

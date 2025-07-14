@@ -1,11 +1,21 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import Button from '@/components/button/Button';
-import { InputTexto } from '@/components/ui/InputText';
-import TabelaFiltros from '@/components/tabela/TabelaFiltros';
 import { useRouter } from 'next/navigation';
-import Modal from '@/components/Modal_Simples/Modal'; // Assuming this Modal component is available
+import Button from '@/components/button/Button';
+import Modal from '@/components/Modal_Simples/Modal';
+import TabelaFiltros from '@/components/tabela/TabelaFiltros';
+import { InputTexto } from '@/components/ui/InputText';
+
+
+import {
+  listarReceitas,
+  buscarReceitaPorId,
+  criarReceita,
+  atualizarReceita,
+  removerReceita,
+  verificarValidadeReceita,
+} from '@/services/ReceitasService'; 
 
 interface Receita {
   idSolicitacao: number;
@@ -14,16 +24,14 @@ interface Receita {
   validade: string;
 }
 
-// Extend Receita interface for editing purposes
 interface ReceitaEditando extends Partial<Receita> {
-  campoParaAtualizar?: keyof Receita; // This allows us to store the name of the field to update
+  campoParaAtualizar?: keyof Receita; 
 }
 
 export default function GerenciarReceita() {
   const router = useRouter();
   const [receitas, setReceitas] = useState<Receita[]>([]);
 
-  // State for modals
   const [modalCriarAberto, setModalCriarAberto] = useState(false);
   const [modalBuscarAberto, setModalBuscarAberto] = useState(false);
   const [modalAtualizarCompletoAberto, setModalAtualizarCompletoAberto] = useState(false);
@@ -31,28 +39,20 @@ export default function GerenciarReceita() {
   const [modalRemoverAberto, setModalRemoverAberto] = useState(false);
   const [modalVerificarValidadeAberto, setModalVerificarValidadeAberto] = useState(false);
 
-
-  // States for forms and search filters
   const [novaReceitaData, setNovaReceitaData] = useState<Partial<Receita>>({});
-  const [receitaEditando, setReceitaEditando] = useState<ReceitaEditando>({}); // For update operations
+  const [receitaEditando, setReceitaEditando] = useState<ReceitaEditando>({}); 
   const [filtroIdSolicitacao, setFiltroIdSolicitacao] = useState('');
 
-  // Display states
   const [receitasExibidas, setReceitasExibidas] = useState<Receita[]>([]);
-  const [mensagemAcao, setMensagemAcao] = useState(''); // General message for success/error
-  const [mensagemValidade, setMensagemValidade] = useState(''); // Specific message for validity check
+  const [mensagemAcao, setMensagemAcao] = useState(''); 
+  const [mensagemValidade, setMensagemValidade] = useState(''); 
 
-  // Initial dummy data load
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') || '' : '';
+
   useEffect(() => {
-    setReceitas([
-      { idSolicitacao: 1, descricao: 'Receita para antibiótico XYZ', data: '2025-06-01', validade: '2025-07-01' },
-      { idSolicitacao: 2, descricao: 'Receita para analgésico ABC', data: '2025-06-15', validade: '2025-08-15' },
-      { idSolicitacao: 3, descricao: 'Receita para remédio de pressão', data: '2025-07-01', validade: '2025-07-10' },
-      { idSolicitacao: 4, descricao: 'Receita para vitaminas', data: '2025-07-05', validade: '2025-09-05' },
-    ]);
+    handleListarTodasReceitas();
   }, []);
 
-  // Helper to reset all modal and form states
   const resetAllStates = () => {
     setModalCriarAberto(false);
     setModalBuscarAberto(false);
@@ -70,9 +70,7 @@ export default function GerenciarReceita() {
     setMensagemValidade('');
   };
 
-  // --- CRUD Operations ---
-
-  const handleAdicionarReceita = (e: React.FormEvent) => {
+  const handleAdicionarReceita = async (e: React.FormEvent) => {
     e.preventDefault();
     const { idSolicitacao, descricao, data, validade } = novaReceitaData;
 
@@ -81,19 +79,26 @@ export default function GerenciarReceita() {
       return;
     }
 
-    const nova: Receita = {
-      idSolicitacao: Number(idSolicitacao),
-      descricao: descricao,
-      data: data,
-      validade: validade,
-    };
-
-    setReceitas(prev => [...prev, nova]);
-    setMensagemAcao(`Receita ID ${nova.idSolicitacao} criada com sucesso!`);
-    resetAllStates();
+    try {
+      const nova = await criarReceita(
+        {
+          idSolicitacao: Number(idSolicitacao),
+          descricao,
+          data,
+          validade,
+        },
+        token
+      );
+      setReceitas(prev => [...prev, nova]);
+      setMensagemAcao(`Receita ID ${nova.idSolicitacao} criada com sucesso!`);
+      resetAllStates();
+      handleListarTodasReceitas();
+    } catch (error: any) {
+      setMensagemAcao(error.message || 'Erro ao criar receita');
+    }
   };
 
-  const handleRemoverReceita = (e: React.FormEvent) => {
+  const handleRemoverReceita = async (e: React.FormEvent) => {
     e.preventDefault();
     const id = Number(filtroIdSolicitacao);
     if (isNaN(id)) {
@@ -101,18 +106,18 @@ export default function GerenciarReceita() {
       return;
     }
 
-    const initialLength = receitas.length;
-    setReceitas(prev => prev.filter(r => r.idSolicitacao !== id));
-
-    if (receitas.length === initialLength) {
-      setMensagemAcao(`Receita com ID ${id} não encontrada.`);
-    } else {
+    try {
+      await removerReceita(id, token);
       setMensagemAcao(`Receita com ID ${id} removida com sucesso!`);
+      setReceitas(prev => prev.filter(r => r.idSolicitacao !== id));
+      resetAllStates();
+      handleListarTodasReceitas();
+    } catch (error: any) {
+      setMensagemAcao(error.message || `Receita com ID ${id} não encontrada.`);
     }
-    resetAllStates();
   };
 
-  const handleAtualizarReceitaCompleta = (e: React.FormEvent) => {
+  const handleAtualizarReceitaCompleta = async (e: React.FormEvent) => {
     e.preventDefault();
     const { idSolicitacao, descricao, data, validade } = receitaEditando;
 
@@ -121,14 +126,17 @@ export default function GerenciarReceita() {
       return;
     }
 
-    setReceitas(prev =>
-      prev.map(r => r.idSolicitacao === idSolicitacao ? { ...r, ...receitaEditando } as Receita : r)
-    );
-    setMensagemAcao(`Receita ID ${idSolicitacao} atualizada por completo com sucesso!`);
-    resetAllStates();
+    try {
+      await atualizarReceita(idSolicitacao, { descricao, data, validade }, token);
+      setMensagemAcao(`Receita ID ${idSolicitacao} atualizada por completo com sucesso!`);
+      resetAllStates();
+      handleListarTodasReceitas();
+    } catch (error: any) {
+      setMensagemAcao(error.message || 'Erro ao atualizar receita');
+    }
   };
 
-  const handleAtualizarCampoReceita = (e: React.FormEvent) => {
+  const handleAtualizarCampoReceita = async (e: React.FormEvent) => {
     e.preventDefault();
     const { idSolicitacao, campoParaAtualizar } = receitaEditando;
 
@@ -137,25 +145,31 @@ export default function GerenciarReceita() {
       return;
     }
 
-    setReceitas(prev =>
-      prev.map(r =>
-        r.idSolicitacao === idSolicitacao
-          ? { ...r, [campoParaAtualizar]: receitaEditando[campoParaAtualizar] } as Receita
-          : r
-      )
-    );
-    setMensagemAcao(`Campo '${campoParaAtualizar}' da receita ID ${idSolicitacao} atualizado com sucesso!`);
-    resetAllStates();
+    try {
+      const payload: any = {
+        [campoParaAtualizar]: receitaEditando[campoParaAtualizar],
+      };
+      await atualizarReceita(idSolicitacao, payload, token);
+      setMensagemAcao(`Campo '${campoParaAtualizar}' da receita ID ${idSolicitacao} atualizado com sucesso!`);
+      resetAllStates();
+      handleListarTodasReceitas();
+    } catch (error: any) {
+      setMensagemAcao(error.message || 'Erro ao atualizar campo da receita');
+    }
   };
 
-  // --- View/List Operations ---
-
-  const handleListarTodasReceitas = () => {
+  const handleListarTodasReceitas = async () => {
     resetAllStates();
-    setReceitasExibidas(receitas);
+    try {
+      const res = await listarReceitas(token);
+      setReceitas(res);
+      setReceitasExibidas(res);
+    } catch (error: any) {
+      setMensagemAcao(error.message || 'Erro ao listar receitas');
+    }
   };
 
-  const handleBuscarReceitaPorId = (e: React.FormEvent) => {
+  const handleBuscarReceitaPorId = async (e: React.FormEvent) => {
     e.preventDefault();
     const id = Number(filtroIdSolicitacao);
     if (isNaN(id)) {
@@ -163,25 +177,45 @@ export default function GerenciarReceita() {
       setReceitasExibidas([]);
       return;
     }
-    const encontrada = receitas.find(r => r.idSolicitacao === id);
-    setReceitasExibidas(encontrada ? [encontrada] : []);
-    setMensagemAcao(encontrada ? '' : `Receita com ID ${id} não encontrada.`);
+    try {
+      const encontrada = await buscarReceitaPorId(id, token);
+      setReceitasExibidas(encontrada ? [encontrada] : []);
+      setMensagemAcao(encontrada ? '' : `Receita com ID ${id} não encontrada.`);
+    } catch (error: any) {
+      setReceitasExibidas([]);
+      setMensagemAcao(error.message || `Receita com ID ${id} não encontrada.`);
+    }
   };
 
-  const verificarValidadeReceitas = () => {
+  const verificarValidadeReceitas = async () => {
     resetAllStates();
-    setModalVerificarValidadeAberto(true); // Open the modal to display the message
+    setModalVerificarValidadeAberto(true);
 
-    if (receitas.length === 0) {
-      setMensagemValidade('Nenhuma receita cadastrada para verificar a validade.');
-      return;
+    try {
+      const todasReceitas = await listarReceitas(token);
+      if (!todasReceitas || todasReceitas.length === 0) {
+        setMensagemValidade('Nenhuma receita cadastrada para verificar a validade.');
+        return;
+      }
+
+      let validas = 0;
+      let vencidas = 0;
+      const hoje = new Date();
+
+      for (const receita of todasReceitas) {
+        try {
+          const resp = await verificarValidadeReceita(receita.idSolicitacao, token);
+          if (resp && resp.valida) validas++;
+          else vencidas++;
+        } catch {
+          vencidas++;
+        }
+      }
+
+      setMensagemValidade(`Receitas válidas: ${validas} | Receitas vencidas: ${vencidas}`);
+    } catch {
+      setMensagemValidade('Erro ao verificar validade das receitas.');
     }
-
-    const hoje = new Date();
-    const vencidas = receitas.filter(r => new Date(r.validade) < hoje);
-    const validas = receitas.filter(r => new Date(r.validade) >= hoje);
-
-    setMensagemValidade(`Receitas válidas: ${validas.length} | Receitas vencidas: ${vencidas.length}`);
   };
 
   const colunasTabela = [
@@ -199,13 +233,11 @@ export default function GerenciarReceita() {
           <Button onClick={() => router.push('/funcionario')}>Voltar</Button>
         </div>
 
-        {/* Action Buttons */}
         <div className="flex flex-wrap gap-4 mb-6">
           <Button onClick={() => { resetAllStates(); setModalCriarAberto(true); }}>Criar Receita</Button>
           <Button onClick={() => { resetAllStates(); setModalBuscarAberto(true); }}>Buscar Receita (por ID)</Button>
           <Button onClick={handleListarTodasReceitas}>Listar Todas as Receitas</Button>
           <Button onClick={verificarValidadeReceitas}>Verificar Validade</Button>
-          {/* Update/Remove actions now primarily done via the table dropdown */}
         </div>
 
         {mensagemAcao && (
@@ -214,7 +246,6 @@ export default function GerenciarReceita() {
           </div>
         )}
 
-        {/* Main Table Display */}
         <h2 className="text-2xl font-bold text-blue-800 mb-4">Receitas Cadastradas</h2>
         <table className="w-full text-left bg-white border">
           <thead className="bg-gray-100 text-blue-800">
@@ -236,26 +267,26 @@ export default function GerenciarReceita() {
                   <td className="p-2">{r.validade}</td>
                   <td className="p-2">
                     <select
-                      onChange={(e) => {
+                      onChange={async (e) => {
                         const opcao = e.target.value;
-                        setReceitaEditando(r); // Set the current receita being edited
+                        setReceitaEditando(r);
+
                         if (opcao === 'atualizarParcial') {
                           setModalAtualizarParcialAberto(true);
                         } else if (opcao === 'atualizarCompleto') {
                           setModalAtualizarCompletoAberto(true);
                         } else if (opcao === 'remover') {
-                          // Direct call to remover, can add a confirmation modal if preferred
                           if (window.confirm(`Tem certeza que deseja remover a receita ID ${r.idSolicitacao}?`)) {
-                            const initialLength = receitas.length;
-                            setReceitas(prev => prev.filter(rec => rec.idSolicitacao !== r.idSolicitacao));
-                            if (receitas.length === initialLength) {
-                              setMensagemAcao(`Receita ID ${r.idSolicitacao} não encontrada.`);
-                            } else {
+                            try {
+                              await removerReceita(r.idSolicitacao, token);
                               setMensagemAcao(`Receita ID ${r.idSolicitacao} removida com sucesso!`);
+                              handleListarTodasReceitas();
+                            } catch (error: any) {
+                              setMensagemAcao(error.message || `Receita ID ${r.idSolicitacao} não encontrada.`);
                             }
                           }
                         }
-                        e.target.value = ""; // Reset select to "Ações" after selection
+                        e.target.value = "";
                       }}
                       defaultValue=""
                       className="border rounded px-2 py-1"
@@ -280,7 +311,6 @@ export default function GerenciarReceita() {
           </tbody>
         </table>
 
-        {/* Display for "Listar Todas as Receitas" and search results from modals */}
         {receitasExibidas.length > 0 && receitasExibidas.length !== receitas.length && (
           <div className="mt-6">
             <h2 className="text-2xl font-bold text-blue-800 mb-4">Resultados da Busca</h2>
@@ -288,9 +318,6 @@ export default function GerenciarReceita() {
           </div>
         )}
 
-        {/* --- Modals --- */}
-
-        {/* Modal for Criar Receita */}
         <Modal isOpen={modalCriarAberto} onClose={() => resetAllStates()} title="Criar Nova Receita">
           <form onSubmit={handleAdicionarReceita} className="space-y-4">
             <InputTexto placeholder="ID da Solicitação" type="number" value={novaReceitaData.idSolicitacao?.toString() || ''} onChange={e => setNovaReceitaData({ ...novaReceitaData, idSolicitacao: Number(e.target.value) })} />
@@ -302,7 +329,6 @@ export default function GerenciarReceita() {
           {mensagemAcao && <p className="mt-4 text-red-600">{mensagemAcao}</p>}
         </Modal>
 
-        {/* Modal for Buscar Receita por ID */}
         <Modal isOpen={modalBuscarAberto} onClose={() => resetAllStates()} title="Buscar Receita por ID">
           <form onSubmit={handleBuscarReceitaPorId} className="space-y-4">
             <InputTexto placeholder="ID da Solicitação" type="number" value={filtroIdSolicitacao} onChange={e => setFiltroIdSolicitacao(e.target.value)} />
@@ -318,7 +344,6 @@ export default function GerenciarReceita() {
           )}
         </Modal>
 
-        {/* Modal for Atualizar Receita Completa */}
         <Modal isOpen={modalAtualizarCompletoAberto} onClose={() => resetAllStates()} title="Atualizar Receita Completa">
           <form onSubmit={handleAtualizarReceitaCompleta} className="space-y-4">
             <InputTexto placeholder="ID da Solicitação" type="number" value={receitaEditando.idSolicitacao?.toString() || ''} readOnly disabled className="bg-gray-100 cursor-not-allowed" />
@@ -330,7 +355,6 @@ export default function GerenciarReceita() {
           {mensagemAcao && <p className="mt-4 text-red-600">{mensagemAcao}</p>}
         </Modal>
 
-        {/* Modal for Atualizar Receita Parcial */}
         <Modal isOpen={modalAtualizarParcialAberto} onClose={() => resetAllStates()} title="Atualizar Campo Específico da Receita">
           <form onSubmit={handleAtualizarCampoReceita} className="space-y-4">
             <InputTexto placeholder="ID da Solicitação" type="number" value={receitaEditando.idSolicitacao?.toString() || ''} readOnly disabled className="bg-gray-100 cursor-not-allowed" />
@@ -347,7 +371,6 @@ export default function GerenciarReceita() {
             {receitaEditando.campoParaAtualizar && (
               <InputTexto
                 placeholder={`Novo valor para ${receitaEditando.campoParaAtualizar}`}
-                // Ensure value is correctly cast to string for InputTexto
                 value={receitaEditando[receitaEditando.campoParaAtualizar] !== undefined ? String(receitaEditando[receitaEditando.campoParaAtualizar]) : ''}
                 onChange={(e) => {
                   const value = e.target.value;
@@ -363,13 +386,11 @@ export default function GerenciarReceita() {
           {mensagemAcao && <p className="mt-4 text-red-600">{mensagemAcao}</p>}
         </Modal>
 
-        {/* Modal for Verificar Validade */}
         <Modal isOpen={modalVerificarValidadeAberto} onClose={() => resetAllStates()} title="Verificar Validade das Receitas">
           <div className="p-4 text-gray-800">
             <p>{mensagemValidade}</p>
           </div>
         </Modal>
-
       </div>
     </main>
   );
