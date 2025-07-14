@@ -22,12 +22,16 @@ export default function HomePage() {
             />
           </div>
           <div className="flex items-center gap-4">
-        <a
-          href="http://localhost:5000/login?redirect=http://localhost:3005"
-          className="text-sm text-gray-700 hover:underline"
-        >
-          Entrar / Cadastrar
-        </a>
+          <div className="flex gap-2">
+            <Link href="/login" className="text-sm text-gray-700 hover:underline">
+              Entrar
+            </Link>
+            <span className="text-gray-400">|</span>
+            <Link href="/cadastro" className="text-sm text-gray-700 hover:underline">
+              Cadastrar
+            </Link>
+          </div>
+
 
 
          <FaleConoscoButton />

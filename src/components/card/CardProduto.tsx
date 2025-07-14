@@ -1,10 +1,19 @@
 import React from 'react';
 
-export default function CardProduto() {
+interface CardProdutoProps {
+  nome: string;
+  imagem: string;
+}
+
+export default function CardProduto({ nome, imagem }: CardProdutoProps) {
   return (
-    <div className="border rounded shadow p-4 w-64"> 
-      <img src="https://via.placeholder.com/150" className="w-full h-40 object-cover rounded" /> 
-      <h2 className="mt-2 text-lg font-semibold">Produto Exemplo</h2> 
+    <div className="border rounded shadow p-4 flex flex-col items-center">
+      <img
+        src={imagem}
+        alt={nome}
+        className="w-24 h-24 object-contain mb-2"
+      />
+      <h2 className="mt-2 text-lg font-semibold text-center">{nome}</h2>
     </div>
   );
 }
