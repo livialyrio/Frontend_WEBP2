@@ -25,14 +25,14 @@ export default function UsuarioDashboard() {
   const [usuario, setUsuario] = useState<Usuario | null>(null);
   const [solicitacoes, setSolicitacoes] = useState<Solicitacao[]>([]);
 
-    useEffect(() => {
+  useEffect(() => {
     const token = localStorage.getItem('auth_token');
     if (!token) {
       router.push('/login');
       return;
     }
 
-    // Simulação de dados 
+    // Simulação de dados
     const usuarioFake: Usuario = {
       nome: 'Maria dos Anjos',
       email: 'maria@email.com',
@@ -56,7 +56,10 @@ export default function UsuarioDashboard() {
         <div className="bg-white p-6 rounded-lg shadow-md mb-8">
           <div className="flex justify-between items-center mb-4">
             <h1 className="text-2xl font-bold text-blue-900">Olá, {usuario?.nome}</h1>
-            <Button onClick={() => router.push('/medicamentosDisponiveis')}>Ver Medicamentos Disponíveis</Button>
+            <div className="flex gap-3">
+              <Button onClick={() => router.push('/medicamentosDisponiveis')}>Ver Medicamentos Disponíveis</Button>
+              <Button onClick={() => router.push('/profile')}>Ver meu perfil</Button>
+            </div>
           </div>
 
           <div className="space-y-2 text-gray-800">
