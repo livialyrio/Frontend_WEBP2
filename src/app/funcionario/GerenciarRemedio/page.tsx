@@ -1,11 +1,13 @@
 'use client';
 
 import { useEffect, useState } from 'react';
-import { InputTexto } from '@/componentes/ui/InputText';
-import Modal from '@/componentes/Modal_Simples/Modal'; // Assuming this Modal component is available
-import Button from '@/componentes/button/Button';
+
 import { useRouter } from 'next/navigation';
-import TabelaFiltros from '@/componentes/tabela/TabelaFiltros'; // Keep TabelaFiltros for displaying results
+import Button from '@/components/button/Button';
+import TabelaFiltros from '@/components/tabela/TabelaFiltros';
+import Modal from '@/components/Modal_Simples/Modal';
+import { InputTexto } from '@/components/ui/InputText';
+
 
 interface Remedio {
   id: number;
@@ -16,44 +18,42 @@ interface Remedio {
   fabricante: string;
 }
 
-// Extend Remedio interface for editing purposes
 interface RemedioEditando extends Partial<Remedio> {
-  campoParaAtualizar?: keyof Remedio; // This allows us to store the name of the field to update
+  campoParaAtualizar?: keyof Remedio; 
 }
 
 export default function GerenciarRemedio() {
   const router = useRouter();
   const [remedios, setRemedios] = useState<Remedio[]>([]);
 
-  // State for modals
+ 
   const [modalAdicionarAberto, setModalAdicionarAberto] = useState(false);
   const [modalEditarCompletoAberto, setModalEditarCompletoAberto] = useState(false);
   const [modalEditarItemAberto, setModalEditarItemAberto] = useState(false);
-  const [modalRemoverAberto, setModalRemoverAberto] = useState(false); // Although removal is direct, keeping for consistency if a confirmation modal were desired
+  const [modalRemoverAberto, setModalRemoverAberto] = useState(false); 
   const [modalListarUmAberto, setModalListarUmAberto] = useState(false);
   const [modalListarCategoriaAberto, setModalListarCategoriaAberto] = useState(false);
   const [modalListarPrincipioAberto, setModalListarPrincipioAberto] = useState(false);
 
 
-  // State for current item being edited/viewed
-  // Use the new RemedioEditando interface here
-  const [remedioEditando, setRemedioEditando] = useState<RemedioEditando>({}); // For complete and partial edits
-  const [novoRemedioData, setNovoRemedioData] = useState<Partial<Remedio>>({}); // For adding new remedy
 
-  // Filter states
+  const [remedioEditando, setRemedioEditando] = useState<RemedioEditando>({}); 
+  const [novoRemedioData, setNovoRemedioData] = useState<Partial<Remedio>>({});
+
+
   const [filtroNome, setFiltroNome] = useState('');
   const [filtroId, setFiltroId] = useState('');
   const [filtroCategoria, setFiltroCategoria] = useState('');
   const [filtroPrincipioAtivo, setFiltroPrincipioAtivo] = useState('');
 
-  // Display states (for TabelaFiltros or direct display)
+
   const [remediosExibidos, setRemediosExibidos] = useState<Remedio[]>([]);
   const [todasCategoriasExibidas, setTodasCategoriasExibidas] = useState<string[]>([]);
 
-  // Message after an action
+
   const [mensagemAcao, setMensagemAcao] = useState('');
 
-  // Initial dummy data load
+
   useEffect(() => {
     setRemedios([
       { id: 1, nome: 'Paracetamol', categoria: 'Analgésico', principioAtivo: 'Paracetamol', dosagem: '500mg', fabricante: 'MedPharma' },
@@ -64,7 +64,7 @@ export default function GerenciarRemedio() {
     ]);
   }, []);
 
-  // Helper to reset all modal and form states
+
   const resetAllStates = () => {
     setModalAdicionarAberto(false);
     setModalEditarCompletoAberto(false);
@@ -87,7 +87,7 @@ export default function GerenciarRemedio() {
     setMensagemAcao('');
   };
 
-  // --- CRUD Operations ---
+
 
   const adicionarRemedio = (e: React.FormEvent) => {
     e.preventDefault();
@@ -158,7 +158,6 @@ export default function GerenciarRemedio() {
   };
 
 
-  // --- View/List Operations ---
 
   const listarTodosRemedios = () => {
     resetAllStates();
@@ -239,7 +238,7 @@ export default function GerenciarRemedio() {
           <Button onClick={() => router.push('/funcionario')}>Voltar</Button>
         </div>
 
-        {/* Action Buttons - Similar to GerenciarUsuarios/Farmacias */}
+
         <div className="flex flex-wrap gap-4 mb-6">
           <Button onClick={listarTodosRemedios}>Listar Todos os Remédios</Button>
           <Button onClick={() => { resetAllStates(); setModalListarUmAberto(true); }}>Listar um Remédio (por Nome)</Button>
@@ -247,7 +246,7 @@ export default function GerenciarRemedio() {
           <Button onClick={() => { resetAllStates(); setModalListarCategoriaAberto(true); }}>Listar Categoria</Button>
           <Button onClick={listarTodasCategorias}>Listar Todas as Categorias</Button>
           <Button onClick={() => { resetAllStates(); setModalListarPrincipioAberto(true); }}>Listar por Princípio Ativo</Button>
-          {/* Update/Remove actions are now primarily done via the table dropdown */}
+
         </div>
 
         {mensagemAcao && (
@@ -256,7 +255,7 @@ export default function GerenciarRemedio() {
           </div>
         )}
 
-        {/* Main Table Display */}
+
         <h2 className="text-2xl font-bold text-blue-800 mb-4">Remédios Cadastrados</h2>
         <table className="w-full text-left bg-white border">
           <thead className="bg-gray-100 text-blue-800">
@@ -284,7 +283,7 @@ export default function GerenciarRemedio() {
                     <select
                       onChange={(e) => {
                         const opcao = e.target.value;
-                        setRemedioEditando(r); // Set the current remedio being edited
+                        setRemedioEditando(r); 
                         if (opcao === 'editarItem') {
                           setModalEditarItemAberto(true);
                         } else if (opcao === 'editarCompleto') {
@@ -292,7 +291,7 @@ export default function GerenciarRemedio() {
                         } else if (opcao === 'remover') {
                           removerRemedio(r.id);
                         }
-                        e.target.value = ""; // Reset select to "Ações" after selection
+                        e.target.value = ""; 
                       }}
                       defaultValue=""
                       className="border rounded px-2 py-1"
@@ -317,7 +316,7 @@ export default function GerenciarRemedio() {
           </tbody>
         </table>
 
-        {/* Display for "Listar Todos os Remédios" and search results from modals */}
+
         {remediosExibidos.length > 0 && remediosExibidos.length !== remedios.length && (
           <div className="mt-6">
             <h2 className="text-2xl font-bold text-blue-800 mb-4">Resultados da Busca</h2>
@@ -325,7 +324,7 @@ export default function GerenciarRemedio() {
           </div>
         )}
 
-        {/* Display for "Listar Todas as Categorias" */}
+
         {todasCategoriasExibidas.length > 0 && (
           <div className="mt-6 bg-gray-100 p-4 rounded shadow">
             <h2 className="text-lg font-bold text-blue-800 mb-2">Todas as Categorias Cadastradas:</h2>
@@ -337,9 +336,6 @@ export default function GerenciarRemedio() {
           </div>
         )}
 
-        {/* --- Modals --- */}
-
-        {/* Modal for Adicionar Remédio */}
         <Modal isOpen={modalAdicionarAberto} onClose={() => resetAllStates()} title="Adicionar Novo Remédio">
           <form onSubmit={adicionarRemedio} className="space-y-4">
             <InputTexto placeholder="Nome" value={novoRemedioData.nome || ''} onChange={e => setNovoRemedioData({ ...novoRemedioData, nome: e.target.value })} />
@@ -351,7 +347,7 @@ export default function GerenciarRemedio() {
           </form>
         </Modal>
 
-        {/* Modal for Editar Remédio Completo */}
+
         <Modal isOpen={modalEditarCompletoAberto} onClose={() => resetAllStates()} title="Editar Remédio Completo">
           <form onSubmit={salvarEdicaoCompleta} className="space-y-4">
             <InputTexto placeholder="ID" value={remedioEditando.id || ''} readOnly disabled className="bg-gray-100 cursor-not-allowed" />
@@ -364,12 +360,11 @@ export default function GerenciarRemedio() {
           </form>
         </Modal>
 
-        {/* Modal for Editar Item Específico */}
         <Modal isOpen={modalEditarItemAberto} onClose={() => resetAllStates()} title="Editar Campo Específico do Remédio">
           <form onSubmit={salvarEdicaoItem} className="space-y-4">
             <InputTexto placeholder="ID" value={remedioEditando.id || ''} readOnly disabled className="bg-gray-100 cursor-not-allowed" />
             <select
-              value={remedioEditando.campoParaAtualizar || ''} // Custom state to hold which field to update
+              value={remedioEditando.campoParaAtualizar || ''} 
               onChange={(e) => setRemedioEditando({ ...remedioEditando, campoParaAtualizar: e.target.value as keyof Remedio })}
               className="border rounded px-3 py-2 w-full focus:ring-blue-500 focus:border-blue-500"
             >
@@ -380,7 +375,7 @@ export default function GerenciarRemedio() {
               <option value="dosagem">Dosagem</option>
               <option value="fabricante">Fabricante</option>
             </select>
-            {/* Conditional rendering for the value input based on selected field */}
+
             {remedioEditando.campoParaAtualizar && (
                 <InputTexto
                   placeholder={`Novo valor para ${remedioEditando.campoParaAtualizar}`}
@@ -398,9 +393,7 @@ export default function GerenciarRemedio() {
           </form>
         </Modal>
 
-        {/* Modals for Listing specific items */}
 
-        {/* Modal for Listar um Remédio (by Nome) */}
         <Modal isOpen={modalListarUmAberto} onClose={() => resetAllStates()} title="Listar Remédio por Nome">
           <form onSubmit={listarRemedioPorNome} className="space-y-4">
             <InputTexto placeholder="Nome do remédio" value={filtroNome} onChange={e => setFiltroNome(e.target.value)} />
@@ -416,7 +409,7 @@ export default function GerenciarRemedio() {
           )}
         </Modal>
 
-        {/* Modal for Listar uma Categoria de Remédios */}
+
         <Modal isOpen={modalListarCategoriaAberto} onClose={() => resetAllStates()} title="Listar Remédios por Categoria">
           <form onSubmit={listarPorCategoria} className="space-y-4">
             <InputTexto placeholder="Nome da Categoria" value={filtroCategoria} onChange={e => setFiltroCategoria(e.target.value)} />
@@ -432,7 +425,7 @@ export default function GerenciarRemedio() {
           )}
         </Modal>
 
-        {/* Modal for Listar Remédios por Princípio Ativo */}
+
         <Modal isOpen={modalListarPrincipioAberto} onClose={() => resetAllStates()} title="Listar Remédios por Princípio Ativo">
           <form onSubmit={listarPorPrincipioAtivo} className="space-y-4">
             <InputTexto placeholder="Princípio Ativo" value={filtroPrincipioAtivo} onChange={e => setFiltroPrincipioAtivo(e.target.value)} />
