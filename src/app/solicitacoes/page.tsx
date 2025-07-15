@@ -6,7 +6,7 @@ import FaleConoscoButton from '@/components/fale_conosco/faleConosco';
 import { Dropdown } from '@/components/ui/Dropdown';
 import Button from '@/components/button/Button';
 import { Textarea } from '@/components/ui/textarea';
-
+import Link from 'next/link';
 import { listarRemedios, Remedio } from '@/services/remedioService';
 import { criarSolicitacao } from '@/services/solicitacoesService';
 import { criarReceita } from '@/services/ReceitasService';
@@ -140,12 +140,18 @@ export default function CriarSolicitacao() {
             />
           </div>
           <div className="flex items-center gap-4">
-            <a
-              href="http://localhost:5000/login?redirect=http://localhost:3005"
-              className="text-sm text-gray-700 hover:underline"
-            >
-              Entrar / Cadastrar
-            </a>
+            
+            <div className="flex items-center gap-4">
+          <div className="flex gap-2">
+            <Link href="/login" className="text-sm text-gray-700 hover:underline">
+              Entrar
+            </Link>
+            <span className="text-gray-400">|</span>
+            <Link href="/cadastro" className="text-sm text-gray-700 hover:underline">
+              Cadastrar
+            </Link>
+            </div>
+          </div>
             <FaleConoscoButton />
           </div>
         </div>
