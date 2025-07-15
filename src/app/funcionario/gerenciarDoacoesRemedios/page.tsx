@@ -5,14 +5,22 @@ import { InputTexto } from '@/components/ui/InputText';
 import Modal from '@/components/Modal_Simples/Modal';
 import Button from '@/components/button/Button';
 import { useRouter } from 'next/navigation';
+import {
+  listarDoacoesRemedios,
+  buscarDoacaoPorId,
+  listarDoacoesPorUsuario,
+  criarDoacaoRemedio,
+  atualizarDoacaoRemedio,
+  deletarDoacaoRemedio,
+} from '@/services/doacoesRemediosService';
 
 interface DoacaoRemedio {
-  id: number;
-  solicitacaoId: number;
+  doacaoRemedioId?: number;
+  solicitacaoId?: number;
   usuarioId: number;
   remedioId: number;
   quantidade: number;
-  data_doacao: string;
+  data_doacao?: string;
   data_fim_tratamento: string;
 }
 
@@ -26,75 +34,107 @@ export default function GerenciarDoacoesRemedios() {
   const [filtroDoacaoId, setFiltroDoacaoId] = useState('');
   const [novaDoacao, setNovaDoacao] = useState<Partial<DoacaoRemedio>>({});
   const [editandoDoacao, setEditandoDoacao] = useState<Partial<DoacaoRemedio>>({});
+  const [erro, setErro] = useState<string | null>(null);
+  const token = typeof window !== 'undefined' ? localStorage.getItem('token') || '' : '';
 
   useEffect(() => {
-    const dadosIniciais = [
-      {
-        id: 1,
-        solicitacaoId: 1,
-        usuarioId: 1,
-        remedioId: 2,
-        quantidade: 2,
-        data_doacao: '2025-06-01',
-        data_fim_tratamento: '2025-07-01',
-      },
-    ];
-    setDoacoes(dadosIniciais);
-    setListaCompleta(dadosIniciais);
+    async function carregarDoacoes() {
+      try {
+        const data = await listarDoacoesRemedios(token);
+        setDoacoes(data);
+        setListaCompleta(data);
+        setErro(null);
+      } catch (error) {
+        console.error('Erro ao carregar doações', error);
+        setErro('NetworkError when attempting to fetch resource');
+      }
+    }
+
+    carregarDoacoes();
   }, []);
 
-  function buscarPorUsuario() {
-    const resultado = listaCompleta.filter(d => d.usuarioId === Number(filtroUsuarioId));
-    setDoacoes(resultado);
+  async function buscarPorUsuario() {
+    try {
+      const data = await listarDoacoesPorUsuario(Number(filtroUsuarioId), token);
+      setDoacoes(data);
+      setErro(null);
+    } catch (error) {
+      console.error('Erro ao buscar por usuário', error);
+      setErro('NetworkError when attempting to fetch resource');
+    }
   }
 
-  function buscarPorId() {
-    const resultado = listaCompleta.filter(d => d.id === Number(filtroDoacaoId));
-    setDoacoes(resultado);
+  async function buscarPorId() {
+    try {
+      const data = await buscarDoacaoPorId(Number(filtroDoacaoId), token);
+      setDoacoes([data]);
+      setErro(null);
+    } catch (error) {
+      console.error('Erro ao buscar por ID', error);
+      setErro('NetworkError when attempting to fetch resource');
+    }
   }
 
   function restaurarLista() {
     setDoacoes(listaCompleta);
     setFiltroUsuarioId('');
     setFiltroDoacaoId('');
+    setErro(null);
   }
 
-  function criarDoacao(e: React.FormEvent) {
+  async function criarNovaDoacao(e: React.FormEvent) {
     e.preventDefault();
-    const nova: DoacaoRemedio = {
-      id: listaCompleta.length + 1,
-      solicitacaoId: Number(novaDoacao.solicitacaoId),
-      usuarioId: Number(novaDoacao.usuarioId),
-      remedioId: Number(novaDoacao.remedioId),
-      quantidade: Number(novaDoacao.quantidade),
-      data_doacao: novaDoacao.data_doacao || '',
-      data_fim_tratamento: novaDoacao.data_fim_tratamento || '',
-    };
-    const novaLista = [...listaCompleta, nova];
-    setListaCompleta(novaLista);
-    setDoacoes(novaLista);
-    setModalAberto(false);
+    try {
+      await criarDoacaoRemedio(novaDoacao as DoacaoRemedio, token);
+      const atualizada = await listarDoacoesRemedios(token);
+      setListaCompleta(atualizada);
+      setDoacoes(atualizada);
+      setModalAberto(false);
+      setErro(null);
+    } catch (error) {
+      console.error('Erro ao criar doação', error);
+      setErro('NetworkError when attempting to fetch resource');
+    }
   }
 
-  function salvarEdicao(e: React.FormEvent) {
+  async function salvarEdicao(e: React.FormEvent) {
     e.preventDefault();
-    const novaLista = listaCompleta.map(d =>
-      d.id === editandoDoacao.id ? { ...d, ...editandoDoacao } as DoacaoRemedio : d
-    );
-    setListaCompleta(novaLista);
-    setDoacoes(novaLista);
-    setModalEdicaoAberto(false);
+    try {
+      if (!editandoDoacao.doacaoRemedioId) return;
+      await atualizarDoacaoRemedio(editandoDoacao.doacaoRemedioId, editandoDoacao as DoacaoRemedio, token);
+      const atualizada = await listarDoacoesRemedios(token);
+      setListaCompleta(atualizada);
+      setDoacoes(atualizada);
+      setModalEdicaoAberto(false);
+      setErro(null);
+    } catch (error) {
+      console.error('Erro ao editar doação', error);
+      setErro('NetworkError when attempting to fetch resource');
+    }
   }
 
-  function removerDoacao(id: number) {
-    const novaLista = listaCompleta.filter(d => d.id !== id);
-    setListaCompleta(novaLista);
-    setDoacoes(novaLista);
+  async function removerDoacao(id: number) {
+    try {
+      await deletarDoacaoRemedio(id, token);
+      const atualizada = listaCompleta.filter(d => d.doacaoRemedioId !== id);
+      setListaCompleta(atualizada);
+      setDoacoes(atualizada);
+      setErro(null);
+    } catch (error) {
+      console.error('Erro ao remover doação', error);
+      setErro('NetworkError when attempting to fetch resource');
+    }
   }
 
   return (
     <main className="min-h-screen bg-gradient-to-br from-[#f8fcff] via-[#dceafd] to-[#9eb8dc] p-6">
       <div className="max-w-6xl mx-auto bg-white p-6 rounded-lg shadow-md">
+        {erro && (
+          <div className="bg-red-100 text-red-800 px-4 py-2 rounded mb-4 font-semibold">
+            {erro}
+          </div>
+        )}
+
         <div className="flex items-center justify-between mb-6">
           <h1 className="text-3xl font-bold text-blue-900">Relação Doações - Remédios</h1>
           <div className="flex gap-3">
@@ -109,7 +149,6 @@ export default function GerenciarDoacoesRemedios() {
 
           <InputTexto placeholder="Buscar por ID de usuário" value={filtroUsuarioId} onChange={(e) => setFiltroUsuarioId(e.target.value)} />
           <Button onClick={buscarPorUsuario}>Buscar por Usuário</Button>
-    
 
           <Button onClick={restaurarLista}>Todos os registros</Button>
         </div>
@@ -129,8 +168,8 @@ export default function GerenciarDoacoesRemedios() {
           </thead>
           <tbody>
             {doacoes.map((d) => (
-              <tr key={d.id} className="border-t hover:bg-blue-50">
-                <td className="p-2">{d.id}</td>
+              <tr key={d.doacaoRemedioId} className="border-t hover:bg-blue-50">
+                <td className="p-2">{d.doacaoRemedioId}</td>
                 <td className="p-2">{d.solicitacaoId}</td>
                 <td className="p-2">{d.usuarioId}</td>
                 <td className="p-2">{d.remedioId}</td>
@@ -142,10 +181,10 @@ export default function GerenciarDoacoesRemedios() {
                     onChange={(e) => {
                       const opcao = e.target.value;
                       setEditandoDoacao(d);
-                      if (opcao === 'editar' || opcao === 'editarParcial') {
+                      if (opcao === 'editar') {
                         setModalEdicaoAberto(true);
                       } else if (opcao === 'remover') {
-                        removerDoacao(d.id);
+                        removerDoacao(d.doacaoRemedioId!);
                       }
                     }}
                     defaultValue=""
@@ -162,7 +201,7 @@ export default function GerenciarDoacoesRemedios() {
         </table>
 
         <Modal isOpen={modalAberto} onClose={() => setModalAberto(false)} title="Nova Doação">
-          <form onSubmit={criarDoacao} className="space-y-4">
+          <form onSubmit={criarNovaDoacao} className="space-y-4">
             <InputTexto placeholder="ID da solicitação" onChange={(e) => setNovaDoacao({ ...novaDoacao, solicitacaoId: Number(e.target.value) })} />
             <InputTexto placeholder="ID do usuário" onChange={(e) => setNovaDoacao({ ...novaDoacao, usuarioId: Number(e.target.value) })} />
             <InputTexto placeholder="ID do remédio" onChange={(e) => setNovaDoacao({ ...novaDoacao, remedioId: Number(e.target.value) })} />
