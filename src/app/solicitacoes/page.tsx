@@ -11,6 +11,7 @@ import { listarRemedios, Remedio } from '@/services/remedioService';
 import { criarSolicitacao } from '@/services/solicitacoesService';
 import { criarReceita } from '@/services/ReceitasService';
 import { listarFarmacias, Farmacia } from '@/services/farmaciasService';
+import Image from 'next/image';
 
 export default function CriarSolicitacao() {
   const [remedios, setRemedios] = useState<Remedio[]>([]);
@@ -130,7 +131,13 @@ export default function CriarSolicitacao() {
       <header className="bg-gradient-to-r from-white to-blue-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="text-blue-600 text-2xl font-bold">CefetFarma</div>
+            <Image
+              src="/CefetFarma.png"
+              alt="Logo CefetFarma"
+              width={150}
+              height={50}
+              priority
+            />
           </div>
           <div className="flex-1 mx-8">
             <input
@@ -143,6 +150,7 @@ export default function CriarSolicitacao() {
             
             <div className="flex items-center gap-4">
           <div className="flex gap-2">
+          
             <Link href="/login" className="text-sm text-gray-700 hover:underline">
               Entrar
             </Link>

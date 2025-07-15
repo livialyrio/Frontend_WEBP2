@@ -1,9 +1,12 @@
 'use client';
 
+import Image from 'next/image';
+import Link from 'next/link';
 import NavbarTabs from '@/components/navbar/navbar';
 import { Dropdown } from '@/components/ui/Dropdown';
 import React, { useState } from 'react';
 import CardProduto from '@/components/card/CardProduto';
+import FaleConoscoButton from '@/components/fale_conosco/faleConosco';
 
 type CategoriaMedicamento = 'Analgésico' | 'Antibiótico' | 'Anti-inflamatório';
 
@@ -53,21 +56,41 @@ export default function MedicamentosDisponiveisPage() {
     <main className="min-h-screen bg-gray-50 font-sans">
       <header className="bg-gradient-to-r from-white to-blue-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
-          <div className="text-blue-600 text-2xl font-bold">CefetFarma</div>
+
+          <div className="flex items-center gap-2">
+            <Image
+              src="/CefetFarma.png"
+              alt="Logo CefetFarma"
+              width={150}
+              height={50}
+              priority
+            />
+          </div>
+
           <div className="flex-1 mx-8">
             <input
               type="text"
               placeholder="Pesquisar medicamentos, produtos e mais"
-              className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none"
+              className="w-full px-4 py-2 rounded border border-gray-300 focus:outline-none placeholder-[#9eb8dc]"
             />
           </div>
-          <a href="#" className="text-sm text-gray-700 hover:underline">
-            Entrar / Cadastrar
-          </a>
-        </div>
-      </header>
 
-      <NavbarTabs />
+
+          <div className="flex items-center gap-4">
+            <div className="flex gap-2">
+              <Link href="/login" className="text-sm text-gray-700 hover:underline">
+                Entrar
+              </Link>
+              <span className="text-gray-400">|</span>
+              <Link href="/cadastro" className="text-sm text-gray-700 hover:underline">
+                Cadastrar
+              </Link>
+            </div>
+            <FaleConoscoButton />
+          </div>
+        </div>
+        <NavbarTabs />
+      </header>
 
 
       <div className="flex justify-between items-center max-w-5xl mx-auto mt-8 mb-8">
@@ -100,7 +123,6 @@ export default function MedicamentosDisponiveisPage() {
         </div>
         <div className="w-40" />
       </div>
-
 
       <section className="max-w-6xl mx-auto grid grid-cols-1 sm:grid-cols-2 md:grid-cols-4 gap-8 mb-10">
         {medicamentos.length > 0 ? (
