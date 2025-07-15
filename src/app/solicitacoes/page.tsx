@@ -6,6 +6,7 @@ import FaleConoscoButton from '@/components/fale_conosco/faleConosco';
 import { Dropdown } from '@/components/ui/Dropdown';
 import Button from '@/components/button/Button';
 import { Textarea } from '@/components/ui/textarea';
+import Image from 'next/image';
 
 import { listarRemedios, Remedio } from '@/services/remedioService';
 import { criarSolicitacao } from '@/services/solicitacoesService';
@@ -130,7 +131,13 @@ export default function CriarSolicitacao() {
       <header className="bg-gradient-to-r from-white to-blue-100 shadow-sm">
         <div className="max-w-7xl mx-auto px-4 py-3 flex justify-between items-center">
           <div className="flex items-center gap-2">
-            <div className="text-blue-600 text-2xl font-bold">CefetFarma</div>
+            <Image
+              src="/CefetFarmaLogo.png"
+              alt="Logo CefetFarma"
+              width={150}
+              height={50}
+              priority
+            />
           </div>
           <div className="flex-1 mx-8">
             <input
